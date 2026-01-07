@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { updateCard } from "../api";
 import { Card, UpdateCardRequest } from "../types";
 import { COLUMNS_QUERY_KEY } from "@/features/column/hooks";
@@ -45,10 +46,15 @@ export function useUpdateCard() {
       return { previousColumns };
     },
 
+    onSuccess: () => {
+      toast.success("카드가 수정되었습니다.");
+    },
+
     onError: (_error, _variables, context) => {
       if (context?.previousColumns) {
         queryClient.setQueryData(COLUMNS_QUERY_KEY, context.previousColumns);
       }
+      toast.error("카드 수정에 실패했습니다.");
     },
 
     onSettled: () => {

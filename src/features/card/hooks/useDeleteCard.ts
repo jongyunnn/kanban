@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { deleteCard } from "../api";
 import { COLUMNS_QUERY_KEY } from "@/features/column/hooks";
 import { Column } from "@/features/column/types";
@@ -28,10 +29,15 @@ export function useDeleteCard() {
       return { previousColumns };
     },
 
+    onSuccess: () => {
+      toast.success("카드가 삭제되었습니다.");
+    },
+
     onError: (_error, _cardId, context) => {
       if (context?.previousColumns) {
         queryClient.setQueryData(COLUMNS_QUERY_KEY, context.previousColumns);
       }
+      toast.error("카드 삭제에 실패했습니다.");
     },
 
     onSettled: () => {

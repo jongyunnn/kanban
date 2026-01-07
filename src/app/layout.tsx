@@ -38,7 +38,7 @@ export default function RootLayout({
           <main className="flex-1 pb-[env(safe-area-inset-bottom)]">
             <div className="container mx-auto pt-10 px-4 pb-32">{children}</div>
           </main>
-          <Toaster />
+          <Toaster position="bottom-right" />
         </Providers>
       </body>
     </html>

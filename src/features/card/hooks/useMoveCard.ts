@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { moveCard } from "../api";
 import { Card, MoveCardRequest } from "../types";
 import { COLUMNS_QUERY_KEY } from "@/features/column/hooks";
@@ -92,6 +93,7 @@ export function useMoveCard() {
       if (context?.previousColumns) {
         queryClient.setQueryData(COLUMNS_QUERY_KEY, context.previousColumns);
       }
+      toast.error("카드 이동에 실패했습니다.");
     },
 
     onSettled: () => {

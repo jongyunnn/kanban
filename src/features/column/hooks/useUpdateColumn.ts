@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { updateColumn } from "../api";
 import { Column, UpdateColumnRequest } from "../types";
 import { COLUMNS_QUERY_KEY } from "./useColumns";
@@ -35,11 +36,16 @@ export function useUpdateColumn() {
       return { previousColumns };
     },
 
+    onSuccess: () => {
+      toast.success("컬럼이 수정되었습니다.");
+    },
+
     // 에러 시 롤백
     onError: (_error, _variables, context) => {
       if (context?.previousColumns) {
         queryClient.setQueryData(COLUMNS_QUERY_KEY, context.previousColumns);
       }
+      toast.error("컬럼 수정에 실패했습니다.");
     },
 
     // 성공/실패 후 쿼리 무효화
