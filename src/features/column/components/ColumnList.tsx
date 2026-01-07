@@ -1,12 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import { useColumns } from "../hooks";
 import { ColumnItem } from "./ColumnItem";
 import { ColumnAddButton } from "./ColumnAddButton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CardItem, CardAddButton, CardDetailModal } from "@/features/card";
+import { Card } from "@/features/card/types";
 
 export function ColumnList() {
   const { data: columns, isLoading, error } = useColumns();
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [showCardModal, setShowCardModal] = useState(false);
+
+  const handleCardClick = (card: Card) => {
+    setSelectedCard(card);
+    setShowCardModal(true);
+  };
+
+  const handleCloseModal = (open: boolean) => {
+    setShowCardModal(open);
+    if (!open) {
+      setSelectedCard(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -33,44 +50,50 @@ export function ColumnList() {
   const hasColumns = columns && columns.length > 0;
 
   return (
-    <div className="flex gap-4 p-4 overflow-x-auto h-full">
-      {hasColumns ? (
-        <>
-          {columns.map((column) => (
-            <ColumnItem key={column.id} column={column}>
-              {column.cards.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  카드를 추가해보세요
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {column.cards.map((card) => (
-                    <div
-                      key={card.id}
-                      className="bg-background rounded-md p-3 shadow-sm border"
-                    >
-                      <p className="text-sm font-medium">{card.title}</p>
-                      {card.description && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          {card.description}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </ColumnItem>
-          ))}
-          <ColumnAddButton />
-        </>
-      ) : (
-        <div className="flex flex-col items-center justify-center w-full h-64 gap-4">
-          <p className="text-muted-foreground">
-            첫 번째 컬럼을 추가해보세요
-          </p>
-          <ColumnAddButton />
-        </div>
-      )}
-    </div>
+    <>
+      <div className="flex gap-4 p-4 overflow-x-auto h-full">
+        {hasColumns ? (
+          <>
+            {columns.map((column) => (
+              <ColumnItem key={column.id} column={column}>
+                {column.cards.length === 0 ? (
+                  <div className="py-4">
+                    <p className="text-sm text-muted-foreground text-center mb-4">
+                      카드를 추가해보세요
+                    </p>
+                    <CardAddButton columnId={column.id} />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {column.cards.map((card) => (
+                      <CardItem
+                        key={card.id}
+                        card={card}
+                        onClick={() => handleCardClick(card)}
+                      />
+                    ))}
+                    <CardAddButton columnId={column.id} />
+                  </div>
+                )}
+              </ColumnItem>
+            ))}
+            <ColumnAddButton />
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-64 gap-4">
+            <p className="text-muted-foreground">
+              첫 번째 컬럼을 추가해보세요
+            </p>
+            <ColumnAddButton />
+          </div>
+        )}
+      </div>
+
+      <CardDetailModal
+        open={showCardModal}
+        onOpenChange={handleCloseModal}
+        card={selectedCard}
+      />
+    </>
   );
 }
