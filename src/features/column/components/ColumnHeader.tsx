@@ -81,6 +81,7 @@ export function ColumnHeader({ id, title, cardCount, onDeleteClick }: ColumnHead
         ) : (
           <button
             onClick={handleStartEdit}
+            aria-label={`${title} 컬럼 - 클릭하여 이름 수정`}
             className="text-sm font-semibold text-foreground truncate hover:text-primary transition-colors text-left"
           >
             {title}

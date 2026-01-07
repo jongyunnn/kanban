@@ -14,7 +14,11 @@ export function ColumnItem({ column, children }: ColumnItemProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
-    <div className="flex flex-col w-72 shrink-0 bg-muted/50 rounded-lg">
+    <div
+      role="region"
+      aria-label={`${column.title} 컬럼, 카드 ${column.cards.length}개`}
+      className="flex flex-col w-72 shrink-0 bg-muted/50 rounded-lg"
+    >
       <ColumnHeader
         id={column.id}
         title={column.title}

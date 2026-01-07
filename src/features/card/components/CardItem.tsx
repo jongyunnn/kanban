@@ -19,10 +19,12 @@ export function CardItem({ card, onClick }: CardItemProps) {
   return (
     <button
       onClick={onClick}
+      aria-label={`카드: ${card.title}${isOverdue ? " (기한 지남)" : ""}`}
       className={cn(
         "w-full text-left bg-background rounded-md p-3 shadow-sm border transition-all",
         "hover:shadow-md hover:border-primary/50",
-        "focus:outline-none focus:ring-2 focus:ring-primary/50"
+        "focus:outline-none focus:ring-2 focus:ring-primary/50",
+        isOverdue && "border-destructive/50 bg-destructive/5"
       )}
     >
       <p className="text-sm font-medium line-clamp-2">{card.title}</p>
