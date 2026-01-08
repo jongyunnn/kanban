@@ -7,6 +7,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { memo, useMemo } from "react";
 import { CardAddButton } from "@/features/card";
 import { Card } from "@/features/card/types";
 import { ColumnItem } from "@/features/column";
@@ -22,7 +23,7 @@ interface DroppableColumnProps {
   overId?: string | null;
 }
 
-export function DroppableColumn({
+export const DroppableColumn = memo(function DroppableColumn({
   column,
   onCardClick,
   activeItem,
@@ -62,16 +63,20 @@ export function DroppableColumn({
   });
 
   // 카드 ID 목록 계산 (드래그 중인 카드가 이 컬럼으로 이동 중이면 포함)
-  const baseCardIds = column.cards.map((card) => card.id);
-  const cardIds =
-    activeItem?.type === "card" &&
-    activeItem.columnId === column.id &&
-    !baseCardIds.includes(activeItem.id)
+  const cardIds = useMemo(() => {
+    const baseCardIds = column.cards.map((card) => card.id);
+    return activeItem?.type === "card" &&
+      activeItem.columnId === column.id &&
+      !baseCardIds.includes(activeItem.id)
       ? [...baseCardIds, activeItem.id]
       : baseCardIds;
+  }, [column.cards, activeItem, column.id]);
 
   // 현재 드래그 중인 카드 ID
-  const activeCardId = activeItem?.type === "card" ? activeItem.id : null;
+  const activeCardId = useMemo(
+    () => (activeItem?.type === "card" ? activeItem.id : null),
+    [activeItem]
+  );
 
   const isOverColumn = overId === `column-droppable-${column.id}`;
   const isCardDrag = activeItem?.type === "card";
@@ -131,4 +136,6 @@ export function DroppableColumn({
       </ColumnItem>
     </div>
   );
-}
+});
+
+DroppableColumn.displayName = "DroppableColumn";

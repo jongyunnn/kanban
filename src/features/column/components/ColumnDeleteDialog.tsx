@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,7 +20,7 @@ interface ColumnDeleteDialogProps {
   cardCount: number;
 }
 
-export function ColumnDeleteDialog({
+export const ColumnDeleteDialog = memo(function ColumnDeleteDialog({
   open,
   onOpenChange,
   columnId,
@@ -28,17 +29,17 @@ export function ColumnDeleteDialog({
 }: ColumnDeleteDialogProps) {
   const deleteColumn = useDeleteColumn();
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteColumn.mutate(columnId, {
       onSuccess: () => {
         onOpenChange(false);
       },
     });
-  };
+  }, [deleteColumn, columnId, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>컬럼 삭제</DialogTitle>
           <DialogDescription>
@@ -72,4 +73,6 @@ export function ColumnDeleteDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+ColumnDeleteDialog.displayName = "ColumnDeleteDialog";

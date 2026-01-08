@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, isPast, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { AlertCircle, Trash2 } from "lucide-react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { DateInput } from "@/components/ui/date-input";
@@ -28,7 +28,7 @@ interface CardDetailModalProps {
   card: Card | null;
 }
 
-export function CardDetailModal({
+export const CardDetailModal = memo(function CardDetailModal({
   open,
   onOpenChange,
   card,
@@ -63,6 +63,9 @@ export function CardDetailModal({
     }
   }, [card, reset]);
 
+  const dueDate = card?.dueDate ? new Date(card.dueDate) : null;
+  const isOverdue = dueDate && isPast(dueDate) && !isToday(dueDate);
+
   const onSubmit = (data: CardFormValues) => {
     if (!card) return;
 
@@ -83,10 +86,10 @@ export function CardDetailModal({
     );
   };
 
-  const handleDeleteSuccess = () => {
+  const handleDeleteSuccess = useCallback(() => {
     setShowDeleteDialog(false);
     onOpenChange(false);
-  };
+  }, [onOpenChange]);
 
   if (!card) return null;
 
@@ -131,7 +134,15 @@ export function CardDetailModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate">마감일</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="dueDate">마감일</Label>
+                {isOverdue && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
+                    <AlertCircle className="size-3" aria-hidden="true" />
+                    기한 지남
+                  </span>
+                )}
+              </div>
               <Controller
                 name="dueDate"
                 control={control}
@@ -165,7 +176,6 @@ export function CardDetailModal({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-destructive hover:text-destructive"
                 onClick={() => setShowDeleteDialog(true)}
               >
                 <Trash2 className="size-4" />
@@ -202,4 +212,6 @@ export function CardDetailModal({
       />
     </>
   );
-}
+});
+
+CardDetailModal.displayName = "CardDetailModal";

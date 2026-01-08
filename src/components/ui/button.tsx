@@ -40,7 +40,7 @@ function Spinner({ srText }: { srText?: string }) {
     <>
       {srText && <span className="sr-only">{srText}</span>}
       <svg
-        className="mr-1 -ml-1 size-5 animate-spin text-white"
+        className="mr-1 -ml-1 size-5 animate-spin"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

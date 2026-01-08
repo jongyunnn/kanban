@@ -2,7 +2,7 @@
 
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Column } from "../types";
 import { ColumnDeleteDialog } from "./ColumnDeleteDialog";
@@ -17,12 +17,16 @@ interface ColumnItemProps {
   };
 }
 
-export function ColumnItem({
+export const ColumnItem = memo(function ColumnItem({
   column,
   children,
   dragHandleProps,
 }: ColumnItemProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDeleteClick = useCallback(() => {
+    setShowDeleteDialog(true);
+  }, []);
 
   return (
     <div
@@ -34,7 +38,7 @@ export function ColumnItem({
         id={column.id}
         title={column.title}
         cardCount={column.cards.length}
-        onDeleteClick={() => setShowDeleteDialog(true)}
+        onDeleteClick={handleDeleteClick}
         dragHandleProps={dragHandleProps}
       />
 
@@ -51,4 +55,6 @@ export function ColumnItem({
       />
     </div>
   );
-}
+});
+
+ColumnItem.displayName = "ColumnItem";

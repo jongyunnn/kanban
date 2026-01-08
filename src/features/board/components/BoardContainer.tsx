@@ -115,6 +115,13 @@ export function BoardContainer() {
     handleDragCancel,
   } = useBoardDnd({ columns: columns ?? [] });
 
+  const handleCardModalOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) closeCardModal();
+    },
+    [closeCardModal]
+  );
+
   // 드래그 타입에 따른 커스텀 collision detection
   const collisionDetection: CollisionDetection = useCallback(
     (args) => {
@@ -210,9 +217,7 @@ export function BoardContainer() {
         <CardDetailModal
           card={selectedCard}
           open={isCardModalOpen}
-          onOpenChange={(open) => {
-            if (!open) closeCardModal();
-          }}
+          onOpenChange={handleCardModalOpenChange}
         />
       )}
     </>

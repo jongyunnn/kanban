@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, memo, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DatePickerButton } from "@/components/ui/date-picker-button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ interface CardAddButtonProps {
   columnId: string;
 }
 
-export function CardAddButton({ columnId }: CardAddButtonProps) {
+export const CardAddButton = memo(function CardAddButton({ columnId }: CardAddButtonProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -32,7 +32,7 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
     }
   }, [isAdding]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (createCard.isPending || isSubmittingRef.current) return;
     isSubmittingRef.current = true;
 
@@ -62,23 +62,26 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
         },
       }
     );
-  };
+  }, [createCard, title, description, dueDate, columnId]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setTitle("");
     setDescription("");
     setDueDate(undefined);
     setIsAdding(false);
-  };
+  }, []);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSubmit();
-    } else if (e.key === "Escape") {
-      handleCancel();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key === "Escape") {
+        handleCancel();
+      }
+    },
+    [handleSubmit, handleCancel]
+  );
 
   if (!isAdding) {
     return (
@@ -145,4 +148,6 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
       </div>
     </div>
   );
-}
+});
+
+CardAddButton.displayName = "CardAddButton";

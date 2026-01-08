@@ -3,7 +3,7 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { GripVertical, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, memo, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,7 +26,7 @@ interface ColumnHeaderProps {
   };
 }
 
-export function ColumnHeader({
+export const ColumnHeader = memo(function ColumnHeader({
   id,
   title,
   cardCount,
@@ -49,12 +49,12 @@ export function ColumnHeader({
     setEditValue(title);
   }, [title]);
 
-  const handleStartEdit = () => {
+  const handleStartEdit = useCallback(() => {
     setEditValue(title);
     setIsEditing(true);
-  };
+  }, [title]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     const trimmedValue = editValue.trim();
     if (trimmedValue && trimmedValue !== title) {
       updateColumn.mutate({ id, data: { title: trimmedValue } });
@@ -62,21 +62,24 @@ export function ColumnHeader({
       setEditValue(title);
     }
     setIsEditing(false);
-  };
+  }, [editValue, title, updateColumn, id]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setEditValue(title);
     setIsEditing(false);
-  };
+  }, [title]);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSave();
-    } else if (e.key === "Escape") {
-      handleCancel();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSave();
+      } else if (e.key === "Escape") {
+        handleCancel();
+      }
+    },
+    [handleSave, handleCancel]
+  );
 
   return (
     <div className="flex items-center justify-between gap-2 p-3">
@@ -133,7 +136,6 @@ export function ColumnHeader({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={onDeleteClick}
-            className="text-destructive focus:text-destructive"
           >
             <Trash2 className="size-4" />
             삭제
@@ -142,4 +144,6 @@ export function ColumnHeader({
       </DropdownMenu>
     </div>
   );
-}
+});
+
+ColumnHeader.displayName = "ColumnHeader";

@@ -60,7 +60,7 @@ export const CardItem = memo(function CardItem({
           <div className="flex items-center gap-1 shrink-0">
             {isOverdue && (
               <AlertCircle
-                className="size-4 text-destructive mt-0.5"
+                className="size-4 text-destructive"
                 aria-hidden="true"
               />
             )}
@@ -69,7 +69,7 @@ export const CardItem = memo(function CardItem({
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  className="size-6 -mr-1"
+                  className="size-5 -mr-1"
                   aria-label="카드 메뉴"
                 >
                   <MoreHorizontal className="size-4" />
@@ -81,7 +81,6 @@ export const CardItem = memo(function CardItem({
                     e.stopPropagation();
                     setShowDeleteDialog(true);
                   }}
-                  className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="size-4" />
                   삭제

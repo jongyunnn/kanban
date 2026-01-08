@@ -1,12 +1,12 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, memo, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCreateColumn } from "../hooks";
 
-export function ColumnAddButton() {
+export const ColumnAddButton = memo(function ColumnAddButton() {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,7 +19,7 @@ export function ColumnAddButton() {
     }
   }, [isAdding]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (createColumn.isPending || isSubmittingRef.current) return;
     isSubmittingRef.current = true;
 
@@ -42,21 +42,24 @@ export function ColumnAddButton() {
         },
       }
     );
-  };
+  }, [createColumn, title]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setTitle("");
     setIsAdding(false);
-  };
+  }, []);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSubmit();
-    } else if (e.key === "Escape") {
-      handleCancel();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key === "Escape") {
+        handleCancel();
+      }
+    },
+    [handleSubmit, handleCancel]
+  );
 
   if (!isAdding) {
     return (
@@ -103,4 +106,6 @@ export function ColumnAddButton() {
       </div>
     </div>
   );
-}
+});
+
+ColumnAddButton.displayName = "ColumnAddButton";

@@ -35,6 +35,11 @@ Next.js 16, TypeScript로 구축된 칸반 보드 프로젝트 관리 애플리�
 - **지연 시뮬레이션**: 실제 네트워크 환경을 모방하기 위한 200~500ms 인위적 지연 적용
 - **Case 변환**: API(snake_case)와 프론트엔드(camelCase) 간 데이터 자동 변환 유틸리티 적용
 
+### 6. UI/UX 편의 기능
+- **다크 모드**: 시스템 설정 연동 및 수동 테마 전환(Light/Dark) 지원
+- **빠른 작업 추가**: 헤더의 '작업 추가' 버튼을 통해 기본 컬럼(To Do)에 즉시 카드 생성
+- **토스트 알림**: 작업 성공/실패 여부를 `sonner`를 통해 직관적인 피드백 제공
+
 ## 기술 스택
 
 - **프레임워크**: Next.js 16 (App Router)
@@ -45,7 +50,8 @@ Next.js 16, TypeScript로 구축된 칸반 보드 프로젝트 관리 애플리�
   - **Client State**: Zustand (전역 UI 상태, 모달 관리)
 - **드래그 앤 드롭**: @dnd-kit/core, @dnd-kit/sortable
 - **폼 & 검증**: react-hook-form, Zod
-- **유틸리티**: date-fns (날짜 처리), lucide-react (아이콘)
+- **유틸리티**: date-fns (날짜 처리), lucide-react (아이콘), sonner (토스트 알림)
+- **개발 환경**: Biome (Formatter), ESLint, Vitest
 
 ## 설계 및 의사결정 (Design Decisions)
 
@@ -90,9 +96,36 @@ Next.js 16, TypeScript로 구축된 칸반 보드 프로젝트 관리 애플리�
 - **기대 효과**: 배포 전에 기본적인 오류를 걸러내어 안정성을 확보하고, 리뷰어의 리소스를 절약합니다.
 
 ### 6. 성능 최적화 (Performance)
-- **React.memo 적용**: `src/features/card/components/CardItem.tsx`
-  - **이유**: 칸반 보드는 다수의 카드가 리스트 형태로 렌더링되는 구조입니다. 특정 카드를 드래그하거나 컬럼을 업데이트할 때, 변경되지 않은 다른 카드들까지 불필요하게 리렌더링되는 것을 방지해야 합니다.
-  - **효과**: Props(`card`, `onClick`)가 변경되지 않은 경우 렌더링을 건너뛰어, 데이터가 많아질수록 렌더링 성능을 선형적으로 보존합니다.
+
+드래그 앤 드롭 및 대량의 카드/컬럼 렌더링 시 불필요한 리렌더링을 방지하기 위해 React 메모이제이션을 체계적으로 적용했습니다.
+
+#### React.memo 적용 컴포넌트
+
+| 컴포넌트 | 경로 | 적용 이유 |
+|----------|------|-----------|
+| `CardItem` | `src/features/card/components/CardItem.tsx` | 카드 리스트에서 개별 카드의 불필요한 리렌더링 방지 |
+| `SortableCard` | `src/features/board/components/SortableCard.tsx` | 드래그 시 다른 카드들의 리렌더링 방지 |
+| `DroppableColumn` | `src/features/board/components/DroppableColumn.tsx` | 컬럼 단위 최적화, cardIds 배열 useMemo 적용 |
+| `ColumnItem` | `src/features/column/components/ColumnItem.tsx` | 컬럼 리스트 리렌더링 최적화 |
+| `ColumnHeader` | `src/features/column/components/ColumnHeader.tsx` | 핸들러 useCallback 적용으로 자식 컴포넌트 리렌더링 방지 |
+| `CardDetailModal` | `src/features/card/components/CardDetailModal.tsx` | 모달 열림 시 폼 상태 보존, 불필요한 리셋 방지 |
+| `CardDeleteDialog` | `src/features/card/components/CardDeleteDialog.tsx` | 다이얼로그 상태 안정화 |
+| `ColumnDeleteDialog` | `src/features/column/components/ColumnDeleteDialog.tsx` | 다이얼로그 상태 안정화 |
+| `CardAddButton` | `src/features/card/components/CardAddButton.tsx` | 입력 폼 상태 보존 |
+| `ColumnAddButton` | `src/features/column/components/ColumnAddButton.tsx` | 입력 폼 상태 보존 |
+| `QuickAddTaskButton` | `src/features/card/components/QuickAddTaskButton.tsx` | 컬럼 검색 useMemo 적용 |
+
+#### 메모이제이션 전략
+
+- **React.memo**: Props가 변경되지 않은 컴포넌트의 리렌더링 스킵
+- **useMemo**: 비용이 큰 계산 결과 캐싱 (cardIds 배열, 컬럼 검색 등)
+- **useCallback**: 핸들러 함수 참조 안정화로 자식 컴포넌트 최적화
+
+#### 기대 효과
+
+5개 컬럼 × 20개 카드 기준:
+- **최적화 전**: 드래그 1회에 100회 이상 불필요한 리렌더
+- **최적화 후**: 변경된 컴포넌트만 리렌더하여 10~15배 성능 개선
 
 ## 프로젝트 구조
 

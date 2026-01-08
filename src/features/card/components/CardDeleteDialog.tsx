@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,7 +20,7 @@ interface CardDeleteDialogProps {
   onSuccess?: () => void;
 }
 
-export function CardDeleteDialog({
+export const CardDeleteDialog = memo(function CardDeleteDialog({
   open,
   onOpenChange,
   cardId,
@@ -28,18 +29,18 @@ export function CardDeleteDialog({
 }: CardDeleteDialogProps) {
   const deleteCard = useDeleteCard();
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteCard.mutate(cardId, {
       onSuccess: () => {
         onOpenChange(false);
         onSuccess?.();
       },
     });
-  };
+  }, [deleteCard, cardId, onOpenChange, onSuccess]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>카드 삭제</DialogTitle>
           <DialogDescription>
@@ -67,4 +68,6 @@ export function CardDeleteDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+CardDeleteDialog.displayName = "CardDeleteDialog";

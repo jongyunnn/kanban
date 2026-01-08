@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DateInput } from "@/components/ui/date-input";
 import {
@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useColumns } from "@/features/column/hooks";
 import { useCreateCard } from "../hooks";
 
-export function QuickAddTaskButton() {
+export const QuickAddTaskButton = memo(function QuickAddTaskButton() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -28,17 +28,18 @@ export function QuickAddTaskButton() {
   const createCard = useCreateCard();
 
   // "To Do" 컬럼 찾기
-  const todoColumn = columns?.find(
-    (col) => col.id === "col_001" || col.order === 0
+  const todoColumn = useMemo(
+    () => columns?.find((col) => col.id === "col_001" || col.order === 0),
+    [columns]
   );
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setTitle("");
     setDescription("");
     setDueDate(null);
-  };
+  }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!todoColumn || createCard.isPending || isSubmittingRef.current) return;
     isSubmittingRef.current = true;
 
@@ -66,14 +67,17 @@ export function QuickAddTaskButton() {
         },
       }
     );
-  };
+  }, [todoColumn, createCard, title, description, dueDate, resetForm]);
 
-  const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen);
-    if (!newOpen) {
-      resetForm();
-    }
-  };
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      setOpen(newOpen);
+      if (!newOpen) {
+        resetForm();
+      }
+    },
+    [resetForm]
+  );
 
   // To Do 컬럼이 없으면 버튼 비활성화
   if (!todoColumn) {
@@ -157,4 +161,6 @@ export function QuickAddTaskButton() {
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+QuickAddTaskButton.displayName = "QuickAddTaskButton";
