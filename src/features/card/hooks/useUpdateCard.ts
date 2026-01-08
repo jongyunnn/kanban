@@ -2,10 +2,10 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { updateCard } from "../api";
-import { Card, UpdateCardRequest } from "../types";
 import { COLUMNS_QUERY_KEY } from "@/features/column/hooks";
 import { Column } from "@/features/column/types";
+import { updateCard } from "../api";
+import { Card, UpdateCardRequest } from "../types";
 
 interface UpdateCardVariables {
   id: string;
@@ -15,14 +15,20 @@ interface UpdateCardVariables {
 export function useUpdateCard() {
   const queryClient = useQueryClient();
 
-  return useMutation<Card, Error, UpdateCardVariables, { previousColumns: Column[] | undefined }>({
+  return useMutation<
+    Card,
+    Error,
+    UpdateCardVariables,
+    { previousColumns: Column[] | undefined }
+  >({
     mutationFn: ({ id, data }) => updateCard(id, data),
 
     // 낙관적 업데이트
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: COLUMNS_QUERY_KEY });
 
-      const previousColumns = queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
+      const previousColumns =
+        queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
 
       queryClient.setQueryData<Column[]>(COLUMNS_QUERY_KEY, (oldColumns) => {
         if (!oldColumns) return oldColumns;
@@ -34,7 +40,8 @@ export function useUpdateCard() {
                 ...card,
                 title: data.title ?? card.title,
                 description: data.description ?? card.description,
-                dueDate: data.due_date !== undefined ? data.due_date : card.dueDate,
+                dueDate:
+                  data.due_date !== undefined ? data.due_date : card.dueDate,
                 updatedAt: new Date().toISOString(),
               };
             }

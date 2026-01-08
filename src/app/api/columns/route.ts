@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  db,
-  simulateDelay,
-  columnToResponse,
-} from "@/lib/mock-db";
+import { columnToResponse, db, simulateDelay } from "@/lib/mock-db";
 
 // GET /api/columns - 컬럼 전체 조회 (카드 포함)
 export async function GET() {

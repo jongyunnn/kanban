@@ -2,10 +2,10 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { moveCard } from "../api";
-import { Card, MoveCardRequest } from "../types";
 import { COLUMNS_QUERY_KEY } from "@/features/column/hooks";
 import { Column } from "@/features/column/types";
+import { moveCard } from "../api";
+import { Card, MoveCardRequest } from "../types";
 
 interface MoveCardVariables {
   id: string;
@@ -15,14 +15,20 @@ interface MoveCardVariables {
 export function useMoveCard() {
   const queryClient = useQueryClient();
 
-  return useMutation<Card, Error, MoveCardVariables, { previousColumns: Column[] | undefined }>({
+  return useMutation<
+    Card,
+    Error,
+    MoveCardVariables,
+    { previousColumns: Column[] | undefined }
+  >({
     mutationFn: ({ id, data }) => moveCard(id, data),
 
     // 낙관적 업데이트
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: COLUMNS_QUERY_KEY });
 
-      const previousColumns = queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
+      const previousColumns =
+        queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
 
       queryClient.setQueryData<Column[]>(COLUMNS_QUERY_KEY, (oldColumns) => {
         if (!oldColumns) return oldColumns;
@@ -51,7 +57,11 @@ export function useMoveCard() {
 
             // 같은 컬럼 내 이동인 경우
             if (column.id === data.target_column_id) {
-              const updatedCard = { ...movedCard, order: data.new_order, updatedAt: new Date().toISOString() };
+              const updatedCard = {
+                ...movedCard,
+                order: data.new_order,
+                updatedAt: new Date().toISOString(),
+              };
               const newCards = [...filteredCards];
               newCards.splice(data.new_order, 0, updatedCard);
               return {
@@ -67,7 +77,10 @@ export function useMoveCard() {
           }
 
           // 대상 컬럼에 카드 추가 (다른 컬럼으로 이동하는 경우)
-          if (column.id === data.target_column_id && sourceColumnId !== data.target_column_id) {
+          if (
+            column.id === data.target_column_id &&
+            sourceColumnId !== data.target_column_id
+          ) {
             const updatedCard = {
               ...movedCard,
               columnId: data.target_column_id,

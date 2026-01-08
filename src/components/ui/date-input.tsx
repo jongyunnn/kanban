@@ -1,19 +1,18 @@
 "use client";
 
-import * as React from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { format, parse, isValid } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import { ko } from "date-fns/locale";
-
-import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface DateInputProps {
   value: string | null;
@@ -69,7 +68,10 @@ export function DateInput({
         onChange={handleInputChange}
         disabled={disabled}
         placeholder={placeholder}
-        className={cn("pr-10 [&::-webkit-calendar-picker-indicator]:hidden", inputClassName)}
+        className={cn(
+          "pr-10 [&::-webkit-calendar-picker-indicator]:hidden",
+          inputClassName
+        )}
       />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>

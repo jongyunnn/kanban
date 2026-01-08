@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,7 +19,12 @@ interface ColumnHeaderProps {
   onDeleteClick: () => void;
 }
 
-export function ColumnHeader({ id, title, cardCount, onDeleteClick }: ColumnHeaderProps) {
+export function ColumnHeader({
+  id,
+  title,
+  cardCount,
+  onDeleteClick,
+}: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(title);
   const inputRef = useRef<HTMLInputElement>(null);

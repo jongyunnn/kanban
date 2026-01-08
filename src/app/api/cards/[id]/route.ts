@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db, simulateDelay, cardToResponse } from "@/lib/mock-db";
+import { cardToResponse, db, simulateDelay } from "@/lib/mock-db";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -56,7 +56,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     }
 
     // description 유효성 검사 (제공된 경우)
-    if (description !== undefined && description !== null && description.length > 1000) {
+    if (
+      description !== undefined &&
+      description !== null &&
+      description.length > 1000
+    ) {
       return NextResponse.json(
         {
           error: {
@@ -68,9 +72,14 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
-    const updates: { title?: string; description?: string; dueDate?: string | null } = {};
+    const updates: {
+      title?: string;
+      description?: string;
+      dueDate?: string | null;
+    } = {};
     if (title !== undefined) updates.title = title.trim();
-    if (description !== undefined) updates.description = description?.trim() ?? "";
+    if (description !== undefined)
+      updates.description = description?.trim() ?? "";
     if (due_date !== undefined) updates.dueDate = due_date;
 
     const updatedCard = db.updateCard(id, updates);

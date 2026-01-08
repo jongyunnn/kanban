@@ -45,10 +45,12 @@ export function simulateDelay(): Promise<void> {
 }
 
 // camelCase → snake_case 변환
-export function toSnakeCase<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {
+export function toSnakeCase<T extends Record<string, unknown>>(
+  obj: T
+): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const key in obj) {
-    const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+    const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
     result[snakeKey] = obj[key];
   }
   return result;
@@ -69,7 +71,10 @@ export function cardToResponse(card: Card): CardResponse {
 }
 
 // Column을 API 응답 형식으로 변환 (카드 포함)
-export function columnToResponse(column: Column, cards: Card[]): ColumnResponse {
+export function columnToResponse(
+  column: Column,
+  cards: Card[]
+): ColumnResponse {
   return {
     id: column.id,
     title: column.title,
@@ -102,19 +107,19 @@ class MockDB {
         id: "col_001",
         title: "To Do",
         order: 0,
-        createdAt: "2025-01-10T09:00:00Z"
+        createdAt: "2025-01-10T09:00:00Z",
       },
       {
         id: "col_002",
         title: "In Progress",
         order: 1,
-        createdAt: "2025-01-10T09:00:00Z"
+        createdAt: "2025-01-10T09:00:00Z",
       },
       {
         id: "col_003",
         title: "Done",
         order: 2,
-        createdAt: "2025-01-10T09:00:00Z"
+        createdAt: "2025-01-10T09:00:00Z",
       },
     ];
 
@@ -127,7 +132,7 @@ class MockDB {
         dueDate: "2025-01-15T00:00:00Z",
         order: 0,
         createdAt: "2025-01-10T09:00:00Z",
-        updatedAt: "2025-01-10T09:00:00Z"
+        updatedAt: "2025-01-10T09:00:00Z",
       },
       {
         id: "card_002",
@@ -137,7 +142,7 @@ class MockDB {
         dueDate: null,
         order: 1,
         createdAt: "2025-01-10T10:00:00Z",
-        updatedAt: "2025-01-10T10:00:00Z"
+        updatedAt: "2025-01-10T10:00:00Z",
       },
       {
         id: "card_003",
@@ -147,7 +152,7 @@ class MockDB {
         dueDate: "2025-01-12T00:00:00Z",
         order: 0,
         createdAt: "2025-01-10T11:00:00Z",
-        updatedAt: "2025-01-10T11:00:00Z"
+        updatedAt: "2025-01-10T11:00:00Z",
       },
       {
         id: "card_004",
@@ -157,7 +162,7 @@ class MockDB {
         dueDate: null,
         order: 0,
         createdAt: "2025-01-10T12:00:00Z",
-        updatedAt: "2025-01-10T12:00:00Z"
+        updatedAt: "2025-01-10T12:00:00Z",
       },
       {
         id: "card_005",
@@ -167,7 +172,7 @@ class MockDB {
         dueDate: "2025-01-05T00:00:00Z",
         order: 0,
         createdAt: "2025-01-10T13:00:00Z",
-        updatedAt: "2025-01-10T13:00:00Z"
+        updatedAt: "2025-01-10T13:00:00Z",
       },
     ];
   }
@@ -182,9 +187,10 @@ class MockDB {
   }
 
   createColumn(title: string): Column {
-    const maxOrder = this.columns.length > 0
-      ? Math.max(...this.columns.map((c) => c.order))
-      : -1;
+    const maxOrder =
+      this.columns.length > 0
+        ? Math.max(...this.columns.map((c) => c.order))
+        : -1;
 
     const newColumn: Column = {
       id: generateId("col"),
@@ -239,15 +245,21 @@ class MockDB {
     return this.cards.find((card) => card.id === id);
   }
 
-  createCard(columnId: string, title: string, description: string, dueDate: string | null): Card | null {
+  createCard(
+    columnId: string,
+    title: string,
+    description: string,
+    dueDate: string | null
+  ): Card | null {
     // 컬럼 존재 확인
     const column = this.getColumnById(columnId);
     if (!column) return null;
 
     const columnCards = this.getCardsByColumnId(columnId);
-    const maxOrder = columnCards.length > 0
-      ? Math.max(...columnCards.map((c) => c.order))
-      : -1;
+    const maxOrder =
+      columnCards.length > 0
+        ? Math.max(...columnCards.map((c) => c.order))
+        : -1;
 
     const now = nowISO();
     const newCard: Card = {
@@ -273,7 +285,8 @@ class MockDB {
     if (!card) return null;
 
     if (updates.title !== undefined) card.title = updates.title;
-    if (updates.description !== undefined) card.description = updates.description;
+    if (updates.description !== undefined)
+      card.description = updates.description;
     if (updates.dueDate !== undefined) card.dueDate = updates.dueDate;
     card.updatedAt = nowISO();
 

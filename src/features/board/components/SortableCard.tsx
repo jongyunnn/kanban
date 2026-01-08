@@ -2,8 +2,8 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card } from "@/features/card/types";
 import { CardItem } from "@/features/card";
+import { Card } from "@/features/card/types";
 import { cn } from "@/lib/utils";
 
 interface SortableCardProps {
@@ -42,10 +42,7 @@ export function SortableCard({ card, onClick }: SortableCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className={cn(
-        "touch-none",
-        isDragging && "opacity-50"
-      )}
+      className={cn("touch-none", isDragging && "opacity-50")}
     >
       <CardItem card={card} onClick={onClick} />
     </div>

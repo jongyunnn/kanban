@@ -1,25 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { DateInput } from "@/components/ui/date-input";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { DateInput } from "@/components/ui/date-input";
-import { Card } from "../types";
+import { Textarea } from "@/components/ui/textarea";
 import { useUpdateCard } from "../hooks";
-import { cardFormSchema, CardFormValues } from "../lib/schemas";
+import { CardFormValues, cardFormSchema } from "../lib/schemas";
+import { Card } from "../types";
 import { CardDeleteDialog } from "./CardDeleteDialog";
 
 interface CardDetailModalProps {
@@ -28,7 +28,11 @@ interface CardDetailModalProps {
   card: Card | null;
 }
 
-export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalProps) {
+export function CardDetailModal({
+  open,
+  onOpenChange,
+  card,
+}: CardDetailModalProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const updateCard = useUpdateCard();
 
@@ -41,7 +45,13 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
     },
   });
 
-  const { register, handleSubmit, reset, control, formState: { errors, isDirty } } = form;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors, isDirty },
+  } = form;
 
   useEffect(() => {
     if (card) {
@@ -98,7 +108,9 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
                 maxLength={100}
               />
               {errors.title && (
-                <p className="text-sm text-destructive">{errors.title.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.title.message}
+                </p>
               )}
             </div>
 
@@ -112,7 +124,9 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
                 maxLength={1000}
               />
               {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.description.message}
+                </p>
               )}
             </div>
 
@@ -132,8 +146,18 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
             </div>
 
             <div className="text-xs text-muted-foreground space-y-1">
-              <p>생성일: {format(new Date(card.createdAt), "yyyy년 M월 d일 HH:mm", { locale: ko })}</p>
-              <p>수정일: {format(new Date(card.updatedAt), "yyyy년 M월 d일 HH:mm", { locale: ko })}</p>
+              <p>
+                생성일:{" "}
+                {format(new Date(card.createdAt), "yyyy년 M월 d일 HH:mm", {
+                  locale: ko,
+                })}
+              </p>
+              <p>
+                수정일:{" "}
+                {format(new Date(card.updatedAt), "yyyy년 M월 d일 HH:mm", {
+                  locale: ko,
+                })}
+              </p>
             </div>
 
             <div className="flex justify-between pt-4">
@@ -179,4 +203,3 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
     </>
   );
 }
-

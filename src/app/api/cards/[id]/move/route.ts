@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db, simulateDelay, cardToResponse } from "@/lib/mock-db";
+import { cardToResponse, db, simulateDelay } from "@/lib/mock-db";
 
 interface RouteParams {
   params: Promise<{ id: string }>;

@@ -14,14 +14,20 @@ interface DeleteColumnResult {
 export function useDeleteColumn() {
   const queryClient = useQueryClient();
 
-  return useMutation<DeleteColumnResult, Error, string, { previousColumns: Column[] | undefined }>({
+  return useMutation<
+    DeleteColumnResult,
+    Error,
+    string,
+    { previousColumns: Column[] | undefined }
+  >({
     mutationFn: deleteColumn,
 
     // 낙관적 업데이트
     onMutate: async (columnId) => {
       await queryClient.cancelQueries({ queryKey: COLUMNS_QUERY_KEY });
 
-      const previousColumns = queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
+      const previousColumns =
+        queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
 
       queryClient.setQueryData<Column[]>(COLUMNS_QUERY_KEY, (oldColumns) => {
         if (!oldColumns) return oldColumns;

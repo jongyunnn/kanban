@@ -1,26 +1,26 @@
 "use client";
 
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
+  MeasuringStrategy,
   PointerSensor,
   useSensor,
   useSensors,
-  MeasuringStrategy,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { useColumns } from "@/features/column/hooks";
-import { ColumnAddButton } from "@/features/column";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CardDetailModal } from "@/features/card";
+import { ColumnAddButton } from "@/features/column";
+import { useColumns } from "@/features/column/hooks";
 import { useModalStore } from "@/stores";
 import { useBoardDnd } from "../hooks";
-import { DroppableColumn } from "./DroppableColumn";
 import { CardDragOverlay } from "./CardDragOverlay";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { DroppableColumn } from "./DroppableColumn";
 
 function BoardSkeleton() {
   return (
@@ -48,7 +48,9 @@ function BoardError({ onRetry }: BoardErrorProps) {
     <div className="flex flex-col items-center justify-center h-64 gap-4">
       <div className="flex items-center gap-2 text-destructive">
         <AlertCircle className="w-6 h-6" />
-        <p className="text-lg font-medium">컬럼을 불러오는 중 오류가 발생했습니다.</p>
+        <p className="text-lg font-medium">
+          컬럼을 불러오는 중 오류가 발생했습니다.
+        </p>
       </div>
       <p className="text-muted-foreground text-sm">
         네트워크 연결을 확인하고 다시 시도해주세요.
@@ -74,7 +76,8 @@ function EmptyBoard() {
 
 export function BoardContainer() {
   const { data: columns, isLoading, error, refetch } = useColumns();
-  const { openCardModal, selectedCard, isCardModalOpen, closeCardModal } = useModalStore();
+  const { openCardModal, selectedCard, isCardModalOpen, closeCardModal } =
+    useModalStore();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

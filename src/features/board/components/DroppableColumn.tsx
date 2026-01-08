@@ -5,12 +5,12 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Column } from "@/features/column/types";
+import { CardAddButton } from "@/features/card";
 import { Card } from "@/features/card/types";
 import { ColumnItem } from "@/features/column";
-import { CardAddButton } from "@/features/card";
-import { SortableCard } from "./SortableCard";
+import { Column } from "@/features/column/types";
 import { cn } from "@/lib/utils";
+import { SortableCard } from "./SortableCard";
 
 interface DroppableColumnProps {
   column: Column;

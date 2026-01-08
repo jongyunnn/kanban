@@ -6,9 +6,7 @@ export const cardFormSchema = z.object({
     .string()
     .min(1, "카드 제목은 필수입니다.")
     .max(100, "카드 제목은 100자 이내로 입력해주세요."),
-  description: z
-    .string()
-    .max(1000, "카드 설명은 1000자 이내로 입력해주세요."),
+  description: z.string().max(1000, "카드 설명은 1000자 이내로 입력해주세요."),
   dueDate: z.string().nullable(),
 });
 

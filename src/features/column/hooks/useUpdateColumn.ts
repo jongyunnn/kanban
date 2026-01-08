@@ -14,7 +14,12 @@ interface UpdateColumnVariables {
 export function useUpdateColumn() {
   const queryClient = useQueryClient();
 
-  return useMutation<Column, Error, UpdateColumnVariables, { previousColumns: Column[] | undefined }>({
+  return useMutation<
+    Column,
+    Error,
+    UpdateColumnVariables,
+    { previousColumns: Column[] | undefined }
+  >({
     mutationFn: ({ id, data }) => updateColumn(id, data),
 
     // 낙관적 업데이트
@@ -23,7 +28,8 @@ export function useUpdateColumn() {
       await queryClient.cancelQueries({ queryKey: COLUMNS_QUERY_KEY });
 
       // 이전 데이터 스냅샷
-      const previousColumns = queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
+      const previousColumns =
+        queryClient.getQueryData<Column[]>(COLUMNS_QUERY_KEY);
 
       // 낙관적으로 캐시 업데이트
       queryClient.setQueryData<Column[]>(COLUMNS_QUERY_KEY, (oldColumns) => {

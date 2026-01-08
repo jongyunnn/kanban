@@ -2,10 +2,10 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { createCard } from "../api";
-import { Card, CreateCardRequest } from "../types";
 import { COLUMNS_QUERY_KEY } from "@/features/column/hooks";
 import { Column } from "@/features/column/types";
+import { createCard } from "../api";
+import { Card, CreateCardRequest } from "../types";
 
 export function useCreateCard() {
   const queryClient = useQueryClient();

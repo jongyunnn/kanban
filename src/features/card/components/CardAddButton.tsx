@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { DatePickerButton } from "@/components/ui/date-picker-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { DatePickerButton } from "@/components/ui/date-picker-button";
 import { useCreateCard } from "../hooks";
 
 interface CardAddButtonProps {
@@ -32,6 +32,8 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   }, [isAdding]);
 
   const handleSubmit = () => {
+    if (createCard.isPending) return;
+
     const trimmedTitle = title.trim();
     if (!trimmedTitle) return;
 
@@ -84,7 +86,10 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   }
 
   return (
-    <div ref={formRef} className="bg-background rounded-md p-2 shadow-sm border space-y-2">
+    <div
+      ref={formRef}
+      className="bg-background rounded-md p-2 shadow-sm border space-y-2"
+    >
       <Input
         ref={inputRef}
         value={title}

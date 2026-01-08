@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Column } from "../types";
-import { ColumnHeader } from "./ColumnHeader";
 import { ColumnDeleteDialog } from "./ColumnDeleteDialog";
+import { ColumnHeader } from "./ColumnHeader";
 
 interface ColumnItemProps {
   column: Column;
@@ -28,9 +28,7 @@ export function ColumnItem({ column, children }: ColumnItemProps) {
       />
 
       <ScrollArea className="flex-1 min-h-[200px]">
-        <div className="p-3">
-          {children}
-        </div>
+        <div className="p-3">{children}</div>
       </ScrollArea>
 
       <ColumnDeleteDialog

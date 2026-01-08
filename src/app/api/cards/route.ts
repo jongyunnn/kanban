@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db, simulateDelay, cardToResponse } from "@/lib/mock-db";
+import { cardToResponse, db, simulateDelay } from "@/lib/mock-db";
 
 // POST /api/cards - 카드 생성
 export async function POST(request: Request) {

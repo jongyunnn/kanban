@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import {
-  DragStartEvent,
-  DragOverEvent,
   DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
   UniqueIdentifier,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { Column } from "@/features/column/types";
+import { useCallback, useState } from "react";
 import { useMoveCard } from "@/features/card/hooks";
+import { Column } from "@/features/column/types";
 import { ActiveDragItem, DragData } from "../types";
 
 interface UseBoardDndProps {
@@ -54,42 +54,48 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
   }, []);
 
   // 드래그 중 (다른 컬럼 위로 이동 시)
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event;
+      if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
+      const activeId = active.id;
+      const overId = over.id;
 
-    if (activeId === overId) return;
+      if (activeId === overId) return;
 
-    const activeData = active.data.current as DragData;
-    if (activeData?.type !== "card") return;
+      const activeData = active.data.current as DragData;
+      if (activeData?.type !== "card") return;
 
-    // over가 컬럼인지 카드인지 확인
-    const overData = over.data.current as { type?: string; columnId?: string };
+      // over가 컬럼인지 카드인지 확인
+      const overData = over.data.current as {
+        type?: string;
+        columnId?: string;
+      };
 
-    // 현재 위치한 컬럼 ID 결정
-    let targetColumnId: string | undefined;
+      // 현재 위치한 컬럼 ID 결정
+      let targetColumnId: string | undefined;
 
-    if (overData?.type === "column") {
-      // 빈 컬럼 위에 있는 경우
-      targetColumnId = overData.columnId;
-    } else {
-      // 다른 카드 위에 있는 경우
-      const overColumn = findColumnByCardId(overId);
-      targetColumnId = overColumn?.id;
-    }
+      if (overData?.type === "column") {
+        // 빈 컬럼 위에 있는 경우
+        targetColumnId = overData.columnId;
+      } else {
+        // 다른 카드 위에 있는 경우
+        const overColumn = findColumnByCardId(overId);
+        targetColumnId = overColumn?.id;
+      }
 
-    if (!targetColumnId) return;
+      if (!targetColumnId) return;
 
-    // activeItem의 columnId 업데이트
-    setActiveItem((prev) => {
-      if (!prev) return prev;
-      if (prev.columnId === targetColumnId) return prev;
-      return { ...prev, columnId: targetColumnId };
-    });
-  }, [findColumnByCardId]);
+      // activeItem의 columnId 업데이트
+      setActiveItem((prev) => {
+        if (!prev) return prev;
+        if (prev.columnId === targetColumnId) return prev;
+        return { ...prev, columnId: targetColumnId };
+      });
+    },
+    [findColumnByCardId]
+  );
 
   // 드래그 종료
   const handleDragEnd = useCallback(
@@ -110,7 +116,10 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
       if (!sourceColumn) return;
 
       // over가 컬럼인지 카드인지 확인
-      const overData = over.data.current as { type?: string; columnId?: string };
+      const overData = over.data.current as {
+        type?: string;
+        columnId?: string;
+      };
 
       let targetColumnId: string;
       let newOrder: number;
@@ -125,12 +134,20 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
         if (!overColumn) return;
 
         targetColumnId = overColumn.id;
-        const overCardIndex = overColumn.cards.findIndex((c) => c.id === overId);
+        const overCardIndex = overColumn.cards.findIndex(
+          (c) => c.id === overId
+        );
 
         if (sourceColumnId === targetColumnId) {
           // 같은 컬럼 내 이동
-          const oldIndex = sourceColumn.cards.findIndex((c) => c.id === activeId);
-          const newCards = arrayMove(sourceColumn.cards, oldIndex, overCardIndex);
+          const oldIndex = sourceColumn.cards.findIndex(
+            (c) => c.id === activeId
+          );
+          const newCards = arrayMove(
+            sourceColumn.cards,
+            oldIndex,
+            overCardIndex
+          );
           newOrder = newCards.findIndex((c) => c.id === activeId);
         } else {
           // 다른 컬럼으로 이동
@@ -140,11 +157,11 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
 
       // 위치가 변경된 경우에만 API 호출
       const currentColumn = findColumnByCardId(activeId);
-      const currentIndex = currentColumn?.cards.findIndex((c) => c.id === activeId) ?? -1;
+      const currentIndex =
+        currentColumn?.cards.findIndex((c) => c.id === activeId) ?? -1;
 
       const isSamePosition =
-        sourceColumnId === targetColumnId &&
-        currentIndex === newOrder;
+        sourceColumnId === targetColumnId && currentIndex === newOrder;
 
       if (!isSamePosition) {
         moveCard.mutate({

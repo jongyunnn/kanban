@@ -1,9 +1,9 @@
 "use client";
 
-import { memo } from "react";
 import { format, isPast, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Calendar, AlertCircle } from "lucide-react";
+import { AlertCircle, Calendar } from "lucide-react";
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "../types";
 
@@ -12,7 +12,10 @@ interface CardItemProps {
   onClick: () => void;
 }
 
-export const CardItem = memo(function CardItem({ card, onClick }: CardItemProps) {
+export const CardItem = memo(function CardItem({
+  card,
+  onClick,
+}: CardItemProps) {
   const hasDueDate = card.dueDate !== null;
   const dueDate = hasDueDate ? new Date(card.dueDate!) : null;
   const isOverdue = dueDate && isPast(dueDate) && !isToday(dueDate);
@@ -31,7 +34,10 @@ export const CardItem = memo(function CardItem({ card, onClick }: CardItemProps)
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium line-clamp-2 flex-1">{card.title}</p>
         {isOverdue && (
-          <AlertCircle className="size-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
+          <AlertCircle
+            className="size-4 text-destructive shrink-0 mt-0.5"
+            aria-hidden="true"
+          />
         )}
       </div>
 
