@@ -66,7 +66,7 @@ export function ColumnHeader({ id, title, cardCount, onDeleteClick }: ColumnHead
   };
 
   return (
-    <div className="flex items-center justify-between gap-2 px-2 py-3">
+    <div className="flex items-center justify-between gap-2 p-3">
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {isEditing ? (
           <Input

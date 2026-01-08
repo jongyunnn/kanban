@@ -18,6 +18,7 @@ import { useBoardDnd } from "../hooks";
 import { DroppableColumn } from "./DroppableColumn";
 import { CardDragOverlay } from "./CardDragOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
@@ -121,18 +122,21 @@ export function BoardContainer() {
           },
         }}
       >
-        <div className="flex gap-4 p-4 overflow-x-auto h-full">
-          {columns.map((column) => (
-            <DroppableColumn
-              key={column.id}
-              column={column}
-              onCardClick={openCardModal}
-            />
-          ))}
-          <div className="flex-shrink-0">
-            <ColumnAddButton />
+        <ScrollArea className="h-full">
+          <div className="flex gap-4 p-4 w-max h-[calc(100dvh-56px)]">
+            {columns.map((column) => (
+              <DroppableColumn
+                key={column.id}
+                column={column}
+                onCardClick={openCardModal}
+              />
+            ))}
+            <div className="shrink-0">
+              <ColumnAddButton />
+            </div>
           </div>
-        </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         <CardDragOverlay activeItem={activeItem} />
       </DndContext>
 
