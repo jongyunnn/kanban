@@ -2,7 +2,7 @@
 
 import { format, isPast, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Calendar } from "lucide-react";
+import { Calendar, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "../types";
 
@@ -27,7 +27,12 @@ export function CardItem({ card, onClick }: CardItemProps) {
         isOverdue && "border-destructive/50 bg-destructive/5"
       )}
     >
-      <p className="text-sm font-medium line-clamp-2">{card.title}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm font-medium line-clamp-2 flex-1">{card.title}</p>
+        {isOverdue && (
+          <AlertCircle className="size-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
+        )}
+      </div>
 
       {card.description && (
         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -39,10 +44,10 @@ export function CardItem({ card, onClick }: CardItemProps) {
         <div
           className={cn(
             "flex items-center gap-1 mt-2 text-xs",
-            isOverdue ? "text-destructive" : "text-muted-foreground"
+            isOverdue ? "text-destructive font-medium" : "text-muted-foreground"
           )}
         >
-          <Calendar className="size-3" />
+          <Calendar className="size-3" aria-hidden="true" />
           <span>
             {format(dueDate, "M월 d일", { locale: ko })}
             {isOverdue && " (기한 지남)"}

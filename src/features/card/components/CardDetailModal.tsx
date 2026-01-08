@@ -164,13 +164,12 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
 
       <CardDeleteDialog
         open={showDeleteDialog}
-        onOpenChange={(open) => {
-          setShowDeleteDialog(open);
-          if (!open) handleDeleteSuccess();
-        }}
+        onOpenChange={setShowDeleteDialog}
         cardId={card.id}
         cardTitle={card.title}
+        onSuccess={handleDeleteSuccess}
       />
     </>
   );
 }
+

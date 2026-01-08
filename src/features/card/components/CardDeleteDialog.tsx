@@ -16,6 +16,7 @@ interface CardDeleteDialogProps {
   onOpenChange: (open: boolean) => void;
   cardId: string;
   cardTitle: string;
+  onSuccess?: () => void;
 }
 
 export function CardDeleteDialog({
@@ -23,6 +24,7 @@ export function CardDeleteDialog({
   onOpenChange,
   cardId,
   cardTitle,
+  onSuccess,
 }: CardDeleteDialogProps) {
   const deleteCard = useDeleteCard();
 
@@ -30,9 +32,11 @@ export function CardDeleteDialog({
     deleteCard.mutate(cardId, {
       onSuccess: () => {
         onOpenChange(false);
+        onSuccess?.();
       },
     });
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

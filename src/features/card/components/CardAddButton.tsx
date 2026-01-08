@@ -16,11 +16,15 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const createCard = useCreateCard();
 
   useEffect(() => {
-    if (isAdding && inputRef.current) {
-      inputRef.current.focus();
+    if (isAdding) {
+      // 입력 필드에 포커스
+      inputRef.current?.focus();
+      // 폼이 보이도록 스크롤
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [isAdding]);
 
@@ -74,7 +78,7 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   }
 
   return (
-    <div className="bg-background rounded-md p-2 shadow-sm border space-y-2">
+    <div ref={formRef} className="bg-background rounded-md p-2 shadow-sm border space-y-2">
       <Input
         ref={inputRef}
         value={title}
