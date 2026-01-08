@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
+import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePickerButton } from "@/components/ui/date-picker-button";
 import { useCreateCard } from "../hooks";
 
 interface CardAddButtonProps {
@@ -15,6 +17,7 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const createCard = useCreateCard();
@@ -37,11 +40,13 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
         column_id: columnId,
         title: trimmedTitle,
         description: description.trim(),
+        due_date: dueDate ? format(dueDate, "yyyy-MM-dd") : null,
       },
       {
         onSuccess: () => {
           setTitle("");
           setDescription("");
+          setDueDate(undefined);
           setIsAdding(false);
         },
       }
@@ -51,6 +56,7 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   const handleCancel = () => {
     setTitle("");
     setDescription("");
+    setDueDate(undefined);
     setIsAdding(false);
   };
 
@@ -87,6 +93,7 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
         placeholder="카드 제목 입력"
         maxLength={100}
         disabled={createCard.isPending}
+        className="h-8"
       />
       <Textarea
         value={description}
@@ -95,6 +102,13 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
         maxLength={1000}
         rows={2}
         disabled={createCard.isPending}
+      />
+      <DatePickerButton
+        value={dueDate}
+        onChange={setDueDate}
+        disabled={createCard.isPending}
+        placeholder="마감일 (선택)"
+        label="마감일"
       />
       <div className="flex gap-2">
         <Button

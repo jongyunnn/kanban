@@ -49,7 +49,7 @@ export function CardItem({ card, onClick }: CardItemProps) {
         >
           <Calendar className="size-3" aria-hidden="true" />
           <span>
-            {format(dueDate, "M월 d일", { locale: ko })}
+            {format(dueDate, "yyyy. MM. dd.", { locale: ko })}
             {isOverdue && " (기한 지남)"}
           </span>
         </div>

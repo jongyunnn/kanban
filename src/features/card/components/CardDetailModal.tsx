@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { DateInput } from "@/components/ui/date-input";
 import { Card } from "../types";
 import { useUpdateCard } from "../hooks";
 import { cardFormSchema, CardFormValues } from "../lib/schemas";
@@ -40,7 +41,7 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
     },
   });
 
-  const { register, handleSubmit, reset, formState: { errors, isDirty } } = form;
+  const { register, handleSubmit, reset, control, formState: { errors, isDirty } } = form;
 
   useEffect(() => {
     if (card) {
@@ -117,10 +118,16 @@ export function CardDetailModal({ open, onOpenChange, card }: CardDetailModalPro
 
             <div className="space-y-2">
               <Label htmlFor="dueDate">마감일</Label>
-              <Input
-                id="dueDate"
-                type="date"
-                {...register("dueDate")}
+              <Controller
+                name="dueDate"
+                control={control}
+                render={({ field }) => (
+                  <DateInput
+                    id="dueDate"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
             </div>
 
