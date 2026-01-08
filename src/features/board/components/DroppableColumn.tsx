@@ -95,7 +95,10 @@ export const DroppableColumn = memo(function DroppableColumn({
       <ColumnItem column={column} dragHandleProps={{ attributes, listeners }}>
         <div
           ref={setDroppableRef}
-          className={cn("min-h-[100px] rounded-md", isOver && "bg-primary/5")}
+          className={cn(
+            "min-h-[100px] rounded-md",
+            isOver && column.cards.length === 0 && "bg-primary/5"
+          )}
         >
           <SortableContext
             items={cardIds}

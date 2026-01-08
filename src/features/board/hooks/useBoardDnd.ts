@@ -197,63 +197,59 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
       let targetColumnId: string;
       let newOrder: number;
 
-      if (overData?.type === "column" || overData?.type === "card-add-zone") {
-        // 빈 컬럼에 드롭하거나 카드 추가 영역에 드롭한 경우
+      // 인디케이터가 표시되는 영역에서만 드롭 허용 (카드 위 또는 카드 추가 영역)
+      if (overData?.type === "card-add-zone") {
+        // 카드 추가 영역에 드롭한 경우 - 컬럼 마지막 위치로 이동
         targetColumnId = overData.columnId!;
         const targetColumn = findColumnById(targetColumnId);
-        // 카드 목록의 마지막 위치로 이동
         // 자기 자신이 이 컬럼에 있는 경우 카드 수에서 1을 빼야 함
         const selfInColumn =
           targetColumn?.cards.some((c) => c.id === activeId) ?? false;
         newOrder = selfInColumn
           ? (targetColumn?.cards.length ?? 1) - 1
           : (targetColumn?.cards.length ?? 0);
-      } else {
+      } else if (overData?.type === "card") {
         // 카드 위에 드롭한 경우
         const overColumn = findColumnByCardId(overId);
 
         if (!overColumn) {
-          // 다른 컬럼의 빈 영역에 드롭한 경우 감지를 위해 columns에서 over.id로 시작하는 컬럼 찾기
-          const droppableColumnId = String(overId).replace(
-            "column-droppable-",
-            ""
-          );
-          const droppableColumn = findColumnById(droppableColumnId);
-
-          if (droppableColumn) {
-            targetColumnId = droppableColumnId;
-            // 자기 자신이 이 컬럼에 있는 경우 카드 수에서 1을 빼야 함
-            const selfInColumn = droppableColumn.cards.some(
-              (c) => c.id === activeId
-            );
-            newOrder = selfInColumn
-              ? droppableColumn.cards.length - 1
-              : droppableColumn.cards.length;
-          } else {
-            return; // 유효한 드롭 대상을 찾지 못함
-          }
-        } else {
-          targetColumnId = overColumn.id;
-          const overCardIndex = overColumn.cards.findIndex(
-            (c) => c.id === overId
-          );
-
-          if (sourceColumnId === targetColumnId) {
-            // 같은 컬럼 내 이동
-            const oldIndex = sourceColumn.cards.findIndex(
-              (c) => c.id === activeId
-            );
-            const newCards = arrayMove(
-              sourceColumn.cards,
-              oldIndex,
-              overCardIndex
-            );
-            newOrder = newCards.findIndex((c) => c.id === activeId);
-          } else {
-            // 다른 컬럼으로 이동
-            newOrder = overCardIndex;
-          }
+          return; // 유효한 드롭 대상을 찾지 못함
         }
+
+        targetColumnId = overColumn.id;
+        const overCardIndex = overColumn.cards.findIndex(
+          (c) => c.id === overId
+        );
+
+        if (sourceColumnId === targetColumnId) {
+          // 같은 컬럼 내 이동
+          const oldIndex = sourceColumn.cards.findIndex(
+            (c) => c.id === activeId
+          );
+          const newCards = arrayMove(
+            sourceColumn.cards,
+            oldIndex,
+            overCardIndex
+          );
+          newOrder = newCards.findIndex((c) => c.id === activeId);
+        } else {
+          // 다른 컬럼으로 이동
+          newOrder = overCardIndex;
+        }
+      } else if (overData?.type === "column") {
+        // 빈 컬럼에 드롭한 경우 - 빈 컬럼일 때만 허용
+        targetColumnId = overData.columnId!;
+        const targetColumn = findColumnById(targetColumnId);
+
+        // 빈 컬럼이 아니면 드롭 무시
+        if (targetColumn && targetColumn.cards.length > 0) {
+          return;
+        }
+
+        newOrder = 0;
+      } else {
+        // 그 외 인디케이터가 표시되지 않는 영역 - 드롭 무시
+        return;
       }
 
       // 위치가 변경된 경우에만 API 호출
