@@ -6,12 +6,12 @@ import { pretendard } from "./pretendard";
 
 export const metadata: Metadata = {
   title: {
-    default: "KANBAN",
-    template: "%s | KANBAN",
+    default: "칸반 보드",
+    template: "%s | 칸반 보드",
   },
-  description: "KANBAN",
+  description: "칸반 보드 애플리케이션",
   openGraph: {
-    siteName: "KANBAN",
+    siteName: "칸반 보드",
     locale: "ko_KR",
     type: "website",
   },
@@ -29,15 +29,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // suppressHydrationWarning: 테마 변경으로 인한 속성 불일치 경고를 무시
     <html lang="ko" suppressHydrationWarning>
-      <body
-        className={`${pretendard.className} antialiased min-h-dvh flex flex-col`}
-      >
+      <body className={`${pretendard.className} antialiased`}>
         <Providers>
-          <main className="flex-1 pb-[env(safe-area-inset-bottom)]">
-            <div className="container mx-auto pt-10 px-4 pb-32">{children}</div>
-          </main>
+          {children}
           <Toaster position="bottom-right" />
         </Providers>
       </body>

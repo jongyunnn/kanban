@@ -1,16 +1,18 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BoardContainer } from "@/features/board";
 
 export default function Home() {
   return (
-    <div className="-mx-4 -mt-10 -mb-32 min-h-screen flex flex-col bg-background">
-      <header className="border-b px-4 py-3 shrink-0">
+    <>
+      <header className="fixed top-0 left-0 right-0 border-b px-4 h-14 flex items-center justify-between bg-background">
         <h1 className="text-xl font-bold">칸반 보드</h1>
+        <ThemeToggle />
       </header>
-      <div className="flex-1 overflow-hidden">
+      <main className="h-100dvh bg-background pt-14">
         <BoardContainer />
-      </div>
-    </div>
+      </main>
+    </>
   );
 }
