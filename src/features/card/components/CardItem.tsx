@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { format, isPast, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Calendar, AlertCircle } from "lucide-react";
@@ -11,7 +12,7 @@ interface CardItemProps {
   onClick: () => void;
 }
 
-export function CardItem({ card, onClick }: CardItemProps) {
+export const CardItem = memo(function CardItem({ card, onClick }: CardItemProps) {
   const hasDueDate = card.dueDate !== null;
   const dueDate = hasDueDate ? new Date(card.dueDate!) : null;
   const isOverdue = dueDate && isPast(dueDate) && !isToday(dueDate);
@@ -56,4 +57,4 @@ export function CardItem({ card, onClick }: CardItemProps) {
       )}
     </button>
   );
-}
+});
