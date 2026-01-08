@@ -8,12 +8,12 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { memo, useMemo } from "react";
-import { CardAddButton } from "@/features/card";
 import { Card } from "@/features/card/types";
 import { ColumnItem } from "@/features/column";
 import { Column } from "@/features/column/types";
 import { cn } from "@/lib/utils";
 import { ActiveDragItem } from "../types";
+import { DroppableCardAddZone } from "./DroppableCardAddZone";
 import { SortableCard } from "./SortableCard";
 
 interface DroppableColumnProps {
@@ -78,9 +78,7 @@ export const DroppableColumn = memo(function DroppableColumn({
     [activeItem]
   );
 
-  const isOverColumn = overId === `column-droppable-${column.id}`;
   const isCardDrag = activeItem?.type === "card";
-  const showAppendIndicator = isOverColumn && isCardDrag;
 
   // 컬럼은 드래그 시 위치 변경 애니메이션 적용
   const style = {
@@ -108,10 +106,13 @@ export const DroppableColumn = memo(function DroppableColumn({
                 <p className="text-sm text-muted-foreground text-center mb-4">
                   카드를 추가해보세요
                 </p>
-                <CardAddButton columnId={column.id} />
+                <DroppableCardAddZone
+                  columnId={column.id}
+                  isCardDrag={isCardDrag}
+                />
               </div>
             ) : (
-              <div className="space-y-2 relative">
+              <div className="space-y-2">
                 {column.cards.map((card) => (
                   <SortableCard
                     key={card.id}
@@ -121,14 +122,10 @@ export const DroppableColumn = memo(function DroppableColumn({
                     overId={overId}
                   />
                 ))}
-                {/* 컬럼 하단 드롭 인디케이터 - CSS opacity로 전환하여 마운트/언마운트 방지 */}
-                <div
-                  className={cn(
-                    "absolute bottom-7 w-full h-0.5 bg-primary rounded-full z-10 transition-opacity duration-150",
-                    showAppendIndicator ? "opacity-100" : "opacity-0"
-                  )}
+                <DroppableCardAddZone
+                  columnId={column.id}
+                  isCardDrag={isCardDrag}
                 />
-                <CardAddButton columnId={column.id} />
               </div>
             )}
           </SortableContext>

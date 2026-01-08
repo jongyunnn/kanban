@@ -3,7 +3,14 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { GripVertical, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { KeyboardEvent, memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  KeyboardEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -134,9 +141,7 @@ export const ColumnHeader = memo(function ColumnHeader({
             <Pencil className="size-4" />
             이름 수정
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={onDeleteClick}
-          >
+          <DropdownMenuItem onClick={onDeleteClick}>
             <Trash2 className="size-4" />
             삭제
           </DropdownMenuItem>

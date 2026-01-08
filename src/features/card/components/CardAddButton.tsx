@@ -2,7 +2,14 @@
 
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
-import { KeyboardEvent, memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  KeyboardEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { DatePickerButton } from "@/components/ui/date-picker-button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +20,9 @@ interface CardAddButtonProps {
   columnId: string;
 }
 
-export const CardAddButton = memo(function CardAddButton({ columnId }: CardAddButtonProps) {
+export const CardAddButton = memo(function CardAddButton({
+  columnId,
+}: CardAddButtonProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

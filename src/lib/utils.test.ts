@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  cn,
-  formatNumberWithCommas,
-  formatPhoneNumber,
-  parseFormattedNumber,
-} from "./utils";
+import { cn, formatNumberWithCommas, formatPhoneNumber } from "./utils";
 
 describe("Utils", () => {
   describe("cn", () => {

@@ -4,7 +4,6 @@ import {
   closestCenter,
   closestCorners,
   DndContext,
-  getFirstCollision,
   KeyboardSensor,
   MeasuringStrategy,
   MouseSensor,
@@ -139,11 +138,24 @@ export function BoardContainer() {
         return columnCollisions;
       }
 
-      // 카드 드래그 시: pointerWithin 우선, 없으면 closestCorners
+      // 카드 드래그 시: pointerWithin 우선, 카드 타입 충돌을 우선시
       const pointerCollisions = pointerWithin(args);
-      const collision = getFirstCollision(pointerCollisions);
 
-      if (collision) {
+      if (pointerCollisions.length > 0) {
+        // 카드 타입 충돌을 우선시 (카드 위에 hover 시 카드 인디케이터 표시)
+        const cardCollision = pointerCollisions.find((collision) => {
+          const container = args.droppableContainers.find(
+            (c) => c.id === collision.id
+          );
+          const data = container?.data.current as { type?: string } | undefined;
+          return data?.type === "card";
+        });
+
+        if (cardCollision) {
+          return [cardCollision];
+        }
+
+        // 카드 충돌이 없으면 첫 번째 충돌 사용 (컬럼 droppable 등)
         return pointerCollisions;
       }
 

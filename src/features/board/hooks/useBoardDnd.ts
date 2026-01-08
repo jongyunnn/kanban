@@ -92,7 +92,7 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
 
       if (activeData?.type !== "card") return;
 
-      // over가 컬럼인지 카드인지 확인
+      // over가 컬럼인지 카드인지 카드 추가 영역인지 확인
       const overData = over.data.current as {
         type?: string;
         columnId?: string;
@@ -101,8 +101,8 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
       // 현재 위치한 컬럼 ID 결정
       let targetColumnId: string | undefined;
 
-      if (overData?.type === "column") {
-        // 빈 컬럼 위에 있는 경우
+      if (overData?.type === "column" || overData?.type === "card-add-zone") {
+        // 빈 컬럼 위에 있거나 카드 추가 영역 위에 있는 경우
         targetColumnId = overData.columnId;
       } else {
         // 다른 카드 위에 있는 경우
@@ -197,21 +197,22 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
       let targetColumnId: string;
       let newOrder: number;
 
-      if (overData?.type === "column") {
-        // 빈 컬럼에 드롭한 경우
+      if (overData?.type === "column" || overData?.type === "card-add-zone") {
+        // 빈 컬럼에 드롭하거나 카드 추가 영역에 드롭한 경우
         targetColumnId = overData.columnId!;
         const targetColumn = findColumnById(targetColumnId);
-        // 빈 컬럼이면 0, 아니면 마지막 위치
-        newOrder = targetColumn?.cards.length ?? 0;
+        // 카드 목록의 마지막 위치로 이동
+        // 자기 자신이 이 컬럼에 있는 경우 카드 수에서 1을 빼야 함
+        const selfInColumn =
+          targetColumn?.cards.some((c) => c.id === activeId) ?? false;
+        newOrder = selfInColumn
+          ? (targetColumn?.cards.length ?? 1) - 1
+          : (targetColumn?.cards.length ?? 0);
       } else {
         // 카드 위에 드롭한 경우
         const overColumn = findColumnByCardId(overId);
 
         if (!overColumn) {
-          // 카드를 찾지 못한 경우: activeItem의 columnId로 fallback
-          // (드래그 중 추적된 타겟 컬럼의 마지막 위치로 이동)
-          const fallbackColumnId = cardData.card.columnId;
-
           // 다른 컬럼의 빈 영역에 드롭한 경우 감지를 위해 columns에서 over.id로 시작하는 컬럼 찾기
           const droppableColumnId = String(overId).replace(
             "column-droppable-",
