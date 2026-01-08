@@ -92,8 +92,14 @@ function Button({
       aria-busy={loading || undefined}
       {...props}
     >
-      {loading && <Spinner srText={loadingText} />}
-      {children}
+      {asChild ? (
+        children
+      ) : (
+        <>
+          {loading && <Spinner srText={loadingText} />}
+          {children}
+        </>
+      )}
     </Comp>
   );
 }

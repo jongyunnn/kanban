@@ -26,7 +26,7 @@ function BoardSkeleton() {
   return (
     <div className="flex gap-4 p-4 overflow-x-auto">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="flex-shrink-0 w-72">
+        <div key={i} className="shrink-0 w-72">
           <Skeleton className="h-10 w-full mb-4 rounded-lg" />
           <div className="space-y-2">
             <Skeleton className="h-24 w-full rounded-lg" />
