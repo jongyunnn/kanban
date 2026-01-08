@@ -20,6 +20,7 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const isSubmittingRef = useRef(false);
   const createCard = useCreateCard();
 
   useEffect(() => {
@@ -32,10 +33,14 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
   }, [isAdding]);
 
   const handleSubmit = () => {
-    if (createCard.isPending) return;
+    if (createCard.isPending || isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
 
     const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
+    if (!trimmedTitle) {
+      isSubmittingRef.current = false;
+      return;
+    }
 
     createCard.mutate(
       {
@@ -50,6 +55,10 @@ export function CardAddButton({ columnId }: CardAddButtonProps) {
           setDescription("");
           setDueDate(undefined);
           setIsAdding(false);
+          isSubmittingRef.current = false;
+        },
+        onError: () => {
+          isSubmittingRef.current = false;
         },
       }
     );

@@ -1,6 +1,8 @@
 "use client";
 
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { DraggableAttributes } from "@dnd-kit/core";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import { GripVertical, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useUpdateColumn } from "../hooks";
 
 interface ColumnHeaderProps {
@@ -17,6 +20,10 @@ interface ColumnHeaderProps {
   title: string;
   cardCount: number;
   onDeleteClick: () => void;
+  dragHandleProps?: {
+    attributes: DraggableAttributes;
+    listeners: SyntheticListenerMap | undefined;
+  };
 }
 
 export function ColumnHeader({
@@ -24,6 +31,7 @@ export function ColumnHeader({
   title,
   cardCount,
   onDeleteClick,
+  dragHandleProps,
 }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(title);
@@ -72,6 +80,20 @@ export function ColumnHeader({
 
   return (
     <div className="flex items-center justify-between gap-2 p-3">
+      {dragHandleProps && (
+        <button
+          type="button"
+          className={cn(
+            "touch-none cursor-grab text-muted-foreground hover:text-foreground transition-colors",
+            "active:cursor-grabbing"
+          )}
+          {...dragHandleProps.attributes}
+          {...dragHandleProps.listeners}
+        >
+          <GripVertical className="size-4" />
+          <span className="sr-only">컬럼 드래그 핸들</span>
+        </button>
+      )}
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {isEditing ? (
           <Input

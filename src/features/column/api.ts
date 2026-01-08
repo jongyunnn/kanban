@@ -64,3 +64,15 @@ export async function deleteColumn(
     deletedCardsCount: response.data.deleted_cards_count,
   };
 }
+
+// 컬럼 순서 변경
+export async function moveColumn(
+  id: string,
+  newOrder: number
+): Promise<Column> {
+  const response = await apiClient.patch<ColumnResponse, ColumnResponse>(
+    `/columns/${id}/move`,
+    { new_order: newOrder }
+  );
+  return transformColumn({ ...response.data, cards: [] });
+}

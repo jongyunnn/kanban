@@ -10,6 +10,7 @@ export function ColumnAddButton() {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const isSubmittingRef = useRef(false);
   const createColumn = useCreateColumn();
 
   useEffect(() => {
@@ -19,10 +20,14 @@ export function ColumnAddButton() {
   }, [isAdding]);
 
   const handleSubmit = () => {
-    if (createColumn.isPending) return;
+    if (createColumn.isPending || isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
 
     const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
+    if (!trimmedTitle) {
+      isSubmittingRef.current = false;
+      return;
+    }
 
     createColumn.mutate(
       { title: trimmedTitle },
@@ -30,6 +35,10 @@ export function ColumnAddButton() {
         onSuccess: () => {
           setTitle("");
           setIsAdding(false);
+          isSubmittingRef.current = false;
+        },
+        onError: () => {
+          isSubmittingRef.current = false;
         },
       }
     );

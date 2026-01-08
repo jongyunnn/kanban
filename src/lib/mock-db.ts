@@ -311,6 +311,46 @@ class MockDB {
     return true;
   }
 
+  moveColumn(id: string, newOrder: number): Column | null {
+    const column = this.columns.find((c) => c.id === id);
+    if (!column) return null;
+
+    const currentOrder = column.order;
+    if (currentOrder === newOrder) return column;
+
+    // order 범위 조정
+    const maxOrder = this.columns.length - 1;
+    const adjustedOrder = Math.max(0, Math.min(newOrder, maxOrder));
+
+    // 다른 컬럼들의 order 조정
+    if (adjustedOrder > currentOrder) {
+      // 아래로 이동: 사이의 컬럼들은 order - 1
+      this.columns.forEach((col) => {
+        if (
+          col.id !== id &&
+          col.order > currentOrder &&
+          col.order <= adjustedOrder
+        ) {
+          col.order -= 1;
+        }
+      });
+    } else {
+      // 위로 이동: 사이의 컬럼들은 order + 1
+      this.columns.forEach((col) => {
+        if (
+          col.id !== id &&
+          col.order >= adjustedOrder &&
+          col.order < currentOrder
+        ) {
+          col.order += 1;
+        }
+      });
+    }
+
+    column.order = adjustedOrder;
+    return column;
+  }
+
   moveCard(id: string, targetColumnId: string, newOrder: number): Card | null {
     const card = this.cards.find((c) => c.id === id);
     if (!card) return null;

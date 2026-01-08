@@ -2,15 +2,25 @@
 
 import {
   closestCenter,
+  closestCorners,
   DndContext,
+  getFirstCollision,
   KeyboardSensor,
   MeasuringStrategy,
-  PointerSensor,
+  MouseSensor,
+  pointerWithin,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import type { CollisionDetection } from "@dnd-kit/core";
+import {
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -80,9 +90,15 @@ export function BoardContainer() {
     useModalStore();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -92,11 +108,42 @@ export function BoardContainer() {
 
   const {
     activeItem,
+    overId,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
     handleDragCancel,
   } = useBoardDnd({ columns: columns ?? [] });
+
+  // 드래그 타입에 따른 커스텀 collision detection
+  const collisionDetection: CollisionDetection = useCallback(
+    (args) => {
+      // 컬럼 드래그 시: 컬럼만 대상으로 closestCenter 사용
+      if (activeItem?.type === "column") {
+        const columnCollisions = closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((container) => {
+            const data = container.data.current as
+              | { type?: string; column?: unknown }
+              | undefined;
+            return data?.type === "column" && data?.column;
+          }),
+        });
+        return columnCollisions;
+      }
+
+      // 카드 드래그 시: pointerWithin 우선, 없으면 closestCorners
+      const pointerCollisions = pointerWithin(args);
+      const collision = getFirstCollision(pointerCollisions);
+
+      if (collision) {
+        return pointerCollisions;
+      }
+
+      return closestCorners(args);
+    },
+    [activeItem]
+  );
 
   if (isLoading) {
     return <BoardSkeleton />;
@@ -114,7 +161,7 @@ export function BoardContainer() {
     <>
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -127,20 +174,36 @@ export function BoardContainer() {
       >
         <ScrollArea className="h-full">
           <div className="flex gap-4 p-4 w-max h-[calc(100dvh-56px)]">
-            {columns.map((column) => (
-              <DroppableColumn
-                key={column.id}
-                column={column}
-                onCardClick={openCardModal}
-              />
-            ))}
+            <SortableContext
+              items={columns.map((c) => c.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              {columns.map((column) => (
+                <DroppableColumn
+                  key={column.id}
+                  column={column}
+                  onCardClick={openCardModal}
+                  activeItem={activeItem}
+                  overId={overId}
+                />
+              ))}
+            </SortableContext>
             <div className="shrink-0">
               <ColumnAddButton />
             </div>
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
-        <CardDragOverlay activeItem={activeItem} />
+        <CardDragOverlay
+          activeItem={activeItem}
+          activeCard={
+            activeItem?.type === "card"
+              ? columns
+                  ?.flatMap((c) => c.cards)
+                  .find((c) => c.id === activeItem.id)
+              : null
+          }
+        />
       </DndContext>
 
       {selectedCard && (
