@@ -2,10 +2,9 @@
 
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { memo, useCallback, useState } from "react";
+import { memo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Column } from "../types";
-import { ColumnDeleteDialog } from "./ColumnDeleteDialog";
 import { ColumnHeader } from "./ColumnHeader";
 
 interface ColumnItemProps {
@@ -22,12 +21,6 @@ export const ColumnItem = memo(function ColumnItem({
   children,
   dragHandleProps,
 }: ColumnItemProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const handleDeleteClick = useCallback(() => {
-    setShowDeleteDialog(true);
-  }, []);
-
   return (
     <div
       role="region"
@@ -38,21 +31,12 @@ export const ColumnItem = memo(function ColumnItem({
         id={column.id}
         title={column.title}
         cardCount={column.cards.length}
-        onDeleteClick={handleDeleteClick}
         dragHandleProps={dragHandleProps}
       />
 
       <ScrollArea className="flex-1 min-h-[200px]">
         <div className="p-3">{children}</div>
       </ScrollArea>
-
-      <ColumnDeleteDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        columnId={column.id}
-        columnTitle={column.title}
-        cardCount={column.cards.length}
-      />
     </div>
   );
 });

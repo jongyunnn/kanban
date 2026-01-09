@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format, isPast, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
 import { AlertCircle, Trash2 } from "lucide-react";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { DateInput } from "@/components/ui/date-input";
@@ -17,23 +17,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useModalStore } from "@/stores";
 import { useUpdateCard } from "../hooks";
 import { CardFormValues, cardFormSchema } from "../lib/schemas";
-import { Card } from "../types";
-import { CardDeleteDialog } from "./CardDeleteDialog";
 
-interface CardDetailModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  card: Card | null;
-}
-
-export const CardDetailModal = memo(function CardDetailModal({
-  open,
-  onOpenChange,
-  card,
-}: CardDetailModalProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+export const CardDetailModal = memo(function CardDetailModal() {
+  const {
+    isCardModalOpen,
+    selectedCard: card,
+    closeCardModal,
+    openCardDelete,
+  } = useModalStore();
   const updateCard = useUpdateCard();
 
   const form = useForm<CardFormValues>({
@@ -80,22 +74,17 @@ export const CardDetailModal = memo(function CardDetailModal({
       },
       {
         onSuccess: () => {
-          onOpenChange(false);
+          closeCardModal();
         },
       }
     );
   };
 
-  const handleDeleteSuccess = useCallback(() => {
-    setShowDeleteDialog(false);
-    onOpenChange(false);
-  }, [onOpenChange]);
-
   if (!card) return null;
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={isCardModalOpen} onOpenChange={closeCardModal}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>카드 상세</DialogTitle>
@@ -176,7 +165,10 @@ export const CardDetailModal = memo(function CardDetailModal({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowDeleteDialog(true)}
+                onClick={() => {
+                  openCardDelete(card.id, card.title);
+                  closeCardModal();
+                }}
               >
                 <Trash2 className="size-4" />
                 삭제
@@ -186,7 +178,7 @@ export const CardDetailModal = memo(function CardDetailModal({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => onOpenChange(false)}
+                  onClick={closeCardModal}
                 >
                   취소
                 </Button>
@@ -202,14 +194,6 @@ export const CardDetailModal = memo(function CardDetailModal({
           </form>
         </DialogContent>
       </Dialog>
-
-      <CardDeleteDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        cardId={card.id}
-        cardTitle={card.title}
-        onSuccess={handleDeleteSuccess}
-      />
     </>
   );
 });

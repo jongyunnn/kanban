@@ -1,9 +1,13 @@
 "use client";
 
 import {
+  CollisionDetection,
+  closestCenter,
+  closestCorners,
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
+  pointerWithin,
   UniqueIdentifier,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -279,9 +283,53 @@ export function useBoardDnd({ columns }: UseBoardDndProps) {
     setOverId(null);
   }, []);
 
+  // 드래그 타입에 따른 커스텀 collision detection
+  const collisionDetection: CollisionDetection = useCallback(
+    (args) => {
+      // 컬럼 드래그 시: 컬럼만 대상으로 closestCenter 사용
+      if (activeItem?.type === "column") {
+        const columnCollisions = closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((container) => {
+            const data = container.data.current as
+              | { type?: string; column?: unknown }
+              | undefined;
+            return data?.type === "column" && data?.column;
+          }),
+        });
+        return columnCollisions;
+      }
+
+      // 카드 드래그 시: pointerWithin 우선, 카드 타입 충돌을 우선시
+      const pointerCollisions = pointerWithin(args);
+
+      if (pointerCollisions.length > 0) {
+        // 카드 타입 충돌을 우선시 (카드 위에 hover 시 카드 인디케이터 표시)
+        const cardCollision = pointerCollisions.find((collision) => {
+          const container = args.droppableContainers.find(
+            (c) => c.id === collision.id
+          );
+          const data = container?.data.current as { type?: string } | undefined;
+          return data?.type === "card";
+        });
+
+        if (cardCollision) {
+          return [cardCollision];
+        }
+
+        // 카드 충돌이 없으면 첫 번째 충돌 사용 (컬럼 droppable 등)
+        return pointerCollisions;
+      }
+
+      return closestCorners(args);
+    },
+    [activeItem]
+  );
+
   return {
     activeItem,
     overId,
+    collisionDetection,
     handleDragStart,
     handleDragOver,
     handleDragEnd,

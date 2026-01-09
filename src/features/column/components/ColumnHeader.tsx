@@ -20,13 +20,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useModalStore } from "@/stores";
 import { useUpdateColumn } from "../hooks";
 
 interface ColumnHeaderProps {
   id: string;
   title: string;
   cardCount: number;
-  onDeleteClick: () => void;
   dragHandleProps?: {
     attributes: DraggableAttributes;
     listeners: SyntheticListenerMap | undefined;
@@ -37,12 +37,12 @@ export const ColumnHeader = memo(function ColumnHeader({
   id,
   title,
   cardCount,
-  onDeleteClick,
   dragHandleProps,
 }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(title);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { openColumnDelete } = useModalStore();
   const updateColumn = useUpdateColumn();
 
   useEffect(() => {
@@ -141,7 +141,9 @@ export const ColumnHeader = memo(function ColumnHeader({
             <Pencil className="size-4" />
             이름 수정
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onDeleteClick}>
+          <DropdownMenuItem
+            onClick={() => openColumnDelete(id, title, cardCount)}
+          >
             <Trash2 className="size-4" />
             삭제
           </DropdownMenuItem>

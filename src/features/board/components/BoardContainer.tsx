@@ -1,32 +1,26 @@
 "use client";
 
 import {
-  closestCenter,
-  closestCorners,
   DndContext,
   KeyboardSensor,
   MeasuringStrategy,
   MouseSensor,
-  pointerWithin,
   TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import type { CollisionDetection } from "@dnd-kit/core";
 import {
   horizontalListSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { AlertCircle, RefreshCw } from "lucide-react";
-import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CardDetailModal } from "@/features/card";
-import { ColumnAddButton } from "@/features/column";
+import { CardDeleteDialog, CardDetailModal } from "@/features/card";
+import { ColumnAddButton, ColumnDeleteDialog } from "@/features/column";
 import { useColumns } from "@/features/column/hooks";
-import { useModalStore } from "@/stores";
 import { useBoardDnd } from "../hooks";
 import { CardDragOverlay } from "./CardDragOverlay";
 import { DroppableColumn } from "./DroppableColumn";
@@ -85,8 +79,6 @@ function EmptyBoard() {
 
 export function BoardContainer() {
   const { data: columns, isLoading, error, refetch } = useColumns();
-  const { openCardModal, selectedCard, isCardModalOpen, closeCardModal } =
-    useModalStore();
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -108,61 +100,12 @@ export function BoardContainer() {
   const {
     activeItem,
     overId,
+    collisionDetection,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
     handleDragCancel,
   } = useBoardDnd({ columns: columns ?? [] });
-
-  const handleCardModalOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open) closeCardModal();
-    },
-    [closeCardModal]
-  );
-
-  // 드래그 타입에 따른 커스텀 collision detection
-  const collisionDetection: CollisionDetection = useCallback(
-    (args) => {
-      // 컬럼 드래그 시: 컬럼만 대상으로 closestCenter 사용
-      if (activeItem?.type === "column") {
-        const columnCollisions = closestCenter({
-          ...args,
-          droppableContainers: args.droppableContainers.filter((container) => {
-            const data = container.data.current as
-              | { type?: string; column?: unknown }
-              | undefined;
-            return data?.type === "column" && data?.column;
-          }),
-        });
-        return columnCollisions;
-      }
-
-      // 카드 드래그 시: pointerWithin 우선, 카드 타입 충돌을 우선시
-      const pointerCollisions = pointerWithin(args);
-
-      if (pointerCollisions.length > 0) {
-        // 카드 타입 충돌을 우선시 (카드 위에 hover 시 카드 인디케이터 표시)
-        const cardCollision = pointerCollisions.find((collision) => {
-          const container = args.droppableContainers.find(
-            (c) => c.id === collision.id
-          );
-          const data = container?.data.current as { type?: string } | undefined;
-          return data?.type === "card";
-        });
-
-        if (cardCollision) {
-          return [cardCollision];
-        }
-
-        // 카드 충돌이 없으면 첫 번째 충돌 사용 (컬럼 droppable 등)
-        return pointerCollisions;
-      }
-
-      return closestCorners(args);
-    },
-    [activeItem]
-  );
 
   if (isLoading) {
     return <BoardSkeleton />;
@@ -201,7 +144,6 @@ export function BoardContainer() {
                 <DroppableColumn
                   key={column.id}
                   column={column}
-                  onCardClick={openCardModal}
                   activeItem={activeItem}
                   overId={overId}
                 />
@@ -225,13 +167,10 @@ export function BoardContainer() {
         />
       </DndContext>
 
-      {selectedCard && (
-        <CardDetailModal
-          card={selectedCard}
-          open={isCardModalOpen}
-          onOpenChange={handleCardModalOpenChange}
-        />
-      )}
+      <CardDetailModal />
+
+      <CardDeleteDialog />
+      <ColumnDeleteDialog />
     </>
   );
 }

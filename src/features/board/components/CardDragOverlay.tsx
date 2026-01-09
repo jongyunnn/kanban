@@ -48,7 +48,7 @@ export function CardDragOverlay({
     <DragOverlay dropAnimation={dropAnimation}>
       <div className="w-64 cursor-grabbing shadow-lg rounded-md">
         {activeCard ? (
-          <CardItem card={activeCard} onClick={() => {}} />
+          <CardItem card={activeCard} />
         ) : (
           <div className="bg-background rounded-md p-3 shadow-sm border">
             <p className="text-sm font-medium line-clamp-2">

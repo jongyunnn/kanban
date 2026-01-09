@@ -1,14 +1,13 @@
 "use client";
 
-import { memo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
+import { memo } from "react";
 import { CardItem } from "@/features/card";
 import { Card } from "@/features/card/types";
 import { cn } from "@/lib/utils";
 
 interface SortableCardProps {
   card: Card;
-  onClick: () => void;
   activeCardId?: string | null;
   overId?: string | null;
 }
@@ -18,7 +17,6 @@ const animateLayoutChanges = () => false;
 
 export const SortableCard = memo(function SortableCard({
   card,
-  onClick,
   activeCardId,
   overId,
 }: SortableCardProps) {
@@ -54,7 +52,7 @@ export const SortableCard = memo(function SortableCard({
         {...listeners}
         className={cn("touch-none", isDragging && "opacity-40")}
       >
-        <CardItem card={card} onClick={onClick} />
+        <CardItem card={card} />
       </div>
     </div>
   );

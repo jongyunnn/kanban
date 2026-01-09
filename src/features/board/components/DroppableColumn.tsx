@@ -8,7 +8,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { memo, useMemo } from "react";
-import { Card } from "@/features/card/types";
 import { ColumnItem } from "@/features/column";
 import { Column } from "@/features/column/types";
 import { cn } from "@/lib/utils";
@@ -18,14 +17,12 @@ import { SortableCard } from "./SortableCard";
 
 interface DroppableColumnProps {
   column: Column;
-  onCardClick: (card: Card) => void;
   activeItem: ActiveDragItem | null;
   overId?: string | null;
 }
 
 export const DroppableColumn = memo(function DroppableColumn({
   column,
-  onCardClick,
   activeItem,
   overId,
 }: DroppableColumnProps) {
@@ -120,7 +117,6 @@ export const DroppableColumn = memo(function DroppableColumn({
                   <SortableCard
                     key={card.id}
                     card={card}
-                    onClick={() => onCardClick(card)}
                     activeCardId={activeCardId}
                     overId={overId}
                   />

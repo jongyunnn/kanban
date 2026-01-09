@@ -10,41 +10,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useModalStore } from "@/stores";
 import { useDeleteCard } from "../hooks";
 
-interface CardDeleteDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  cardId: string;
-  cardTitle: string;
-  onSuccess?: () => void;
-}
-
-export const CardDeleteDialog = memo(function CardDeleteDialog({
-  open,
-  onOpenChange,
-  cardId,
-  cardTitle,
-  onSuccess,
-}: CardDeleteDialogProps) {
+export const CardDeleteDialog = memo(function CardDeleteDialog() {
+  const { isCardDeleteOpen, cardToDelete, closeCardDelete } = useModalStore();
   const deleteCard = useDeleteCard();
 
   const handleDelete = useCallback(() => {
-    deleteCard.mutate(cardId, {
+    if (!cardToDelete) return;
+    deleteCard.mutate(cardToDelete.id, {
       onSuccess: () => {
-        onOpenChange(false);
-        onSuccess?.();
+        closeCardDelete();
       },
     });
-  }, [deleteCard, cardId, onOpenChange, onSuccess]);
+  }, [deleteCard, cardToDelete, closeCardDelete]);
+
+  if (!cardToDelete) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isCardDeleteOpen} onOpenChange={closeCardDelete}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>카드 삭제</DialogTitle>
           <DialogDescription>
-            &ldquo;{cardTitle}&rdquo; 카드를 삭제하시겠습니까?
+            &ldquo;{cardToDelete.title}&rdquo; 카드를 삭제하시겠습니까?
             <br />
             삭제된 카드는 복구할 수 없습니다.
           </DialogDescription>
@@ -52,7 +42,7 @@ export const CardDeleteDialog = memo(function CardDeleteDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={closeCardDelete}
             disabled={deleteCard.isPending}
           >
             취소

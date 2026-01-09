@@ -3,7 +3,7 @@
 import { format, isPast, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
 import { AlertCircle, Calendar, MoreHorizontal, Trash2 } from "lucide-react";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,19 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useModalStore } from "@/stores";
 import { Card } from "../types";
-import { CardDeleteDialog } from "./CardDeleteDialog";
 
 interface CardItemProps {
   card: Card;
-  onClick: () => void;
 }
 
-export const CardItem = memo(function CardItem({
-  card,
-  onClick,
-}: CardItemProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+export const CardItem = memo(function CardItem({ card }: CardItemProps) {
+  const { openCardModal, openCardDelete } = useModalStore();
   const hasDueDate = card.dueDate !== null;
   const dueDate = hasDueDate ? new Date(card.dueDate!) : null;
   const isOverdue = dueDate && isPast(dueDate) && !isToday(dueDate);
@@ -36,11 +32,11 @@ export const CardItem = memo(function CardItem({
   return (
     <>
       <div
-        onClick={onClick}
+        onClick={() => openCardModal(card)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onClick();
+            openCardModal(card);
           }
         }}
         role="button"
@@ -79,7 +75,7 @@ export const CardItem = memo(function CardItem({
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowDeleteDialog(true);
+                    openCardDelete(card.id, card.title);
                   }}
                 >
                   <Trash2 className="size-4" />
@@ -113,13 +109,6 @@ export const CardItem = memo(function CardItem({
           </div>
         )}
       </div>
-
-      <CardDeleteDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        cardId={card.id}
-        cardTitle={card.title}
-      />
     </>
   );
 });
