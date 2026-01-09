@@ -141,10 +141,7 @@ export const CardDetailModal = memo(function CardDetailModal() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  openCardDelete(card.id, card.title);
-                  closeCardModal();
-                }}
+                onClick={() => openCardDelete(card.id, card.title)}
               >
                 <Trash2 className="size-4" />
                 삭제

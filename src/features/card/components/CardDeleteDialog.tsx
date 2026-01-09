@@ -14,7 +14,8 @@ import { useModalStore } from "@/stores";
 import { useDeleteCard } from "../hooks";
 
 export const CardDeleteDialog = memo(function CardDeleteDialog() {
-  const { isCardDeleteOpen, cardToDelete, closeCardDelete } = useModalStore();
+  const { isCardDeleteOpen, cardToDelete, closeCardDelete, closeCardModal } =
+    useModalStore();
   const deleteCard = useDeleteCard();
 
   const handleDelete = useCallback(() => {
@@ -22,9 +23,10 @@ export const CardDeleteDialog = memo(function CardDeleteDialog() {
     deleteCard.mutate(cardToDelete.id, {
       onSuccess: () => {
         closeCardDelete();
+        closeCardModal();
       },
     });
-  }, [deleteCard, cardToDelete, closeCardDelete]);
+  }, [deleteCard, cardToDelete, closeCardDelete, closeCardModal]);
 
   if (!cardToDelete) return null;
 
