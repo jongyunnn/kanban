@@ -23,9 +23,13 @@ interface CardAddButtonProps {
 export const CardAddButton = memo(function CardAddButton({
   columnId,
 }: CardAddButtonProps) {
+  // 카드 추가 입력 폼 표시 여부
   const [isAdding, setIsAdding] = useState(false);
+  // 새로 추가할 카드의 제목
   const [title, setTitle] = useState("");
+  // 새로 추가할 카드의 설명
   const [description, setDescription] = useState("");
+  // 새로 추가할 카드의 마감일
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLDivElement>(null);

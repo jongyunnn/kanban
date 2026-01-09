@@ -39,7 +39,9 @@ export const ColumnHeader = memo(function ColumnHeader({
   cardCount,
   dragHandleProps,
 }: ColumnHeaderProps) {
+  // 컬럼 제목 편집 모드 활성화 여부
   const [isEditing, setIsEditing] = useState(false);
+  // 편집 중인 컬럼 제목 값
   const [editValue, setEditValue] = useState(title);
   const inputRef = useRef<HTMLInputElement>(null);
   const { openColumnDelete } = useModalStore();

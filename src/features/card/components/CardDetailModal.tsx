@@ -7,19 +7,16 @@ import { AlertCircle, Trash2 } from "lucide-react";
 import { memo, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { DateInput } from "@/components/ui/date-input";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useModalStore } from "@/stores";
 import { useUpdateCard } from "../hooks";
 import { CardFormValues, cardFormSchema } from "../lib/schemas";
+import { DescriptionField, DueDateField, TitleField } from "./CardFormFields";
 
 export const CardDetailModal = memo(function CardDetailModal() {
   const {
@@ -91,59 +88,38 @@ export const CardDetailModal = memo(function CardDetailModal() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">제목</Label>
-              <Input
-                id="title"
-                {...register("title")}
-                placeholder="카드 제목"
-                maxLength={100}
-              />
-              {errors.title && (
-                <p className="text-sm text-destructive">
-                  {errors.title.message}
-                </p>
-              )}
-            </div>
+            <TitleField
+              id="title"
+              {...register("title")}
+              error={errors.title?.message}
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="description">설명</Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                placeholder="카드 설명"
-                rows={4}
-                maxLength={1000}
-              />
-              {errors.description && (
-                <p className="text-sm text-destructive">
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
+            <DescriptionField
+              id="description"
+              {...register("description")}
+              rows={4}
+              error={errors.description?.message}
+            />
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="dueDate">마감일</Label>
-                {isOverdue && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
-                    <AlertCircle className="size-3" aria-hidden="true" />
-                    기한 지남
-                  </span>
-                )}
-              </div>
-              <Controller
-                name="dueDate"
-                control={control}
-                render={({ field }) => (
-                  <DateInput
-                    id="dueDate"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-            </div>
+            <Controller
+              name="dueDate"
+              control={control}
+              render={({ field }) => (
+                <DueDateField
+                  id="dueDate"
+                  value={field.value}
+                  onChange={field.onChange}
+                  labelExtra={
+                    isOverdue && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
+                        <AlertCircle className="size-3" aria-hidden="true" />
+                        기한 지남
+                      </span>
+                    )
+                  }
+                />
+              )}
+            />
 
             <div className="text-xs text-muted-foreground space-y-1">
               <p>

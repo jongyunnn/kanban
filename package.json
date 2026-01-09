@@ -10,7 +10,7 @@
     "start": "next start",
     "test": "vitest",
     "lint": "eslint",
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "format:check": "biome check ."
   },
   "dependencies": {

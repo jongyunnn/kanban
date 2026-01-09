@@ -14,7 +14,9 @@ import { Input } from "@/components/ui/input";
 import { useCreateColumn } from "../hooks";
 
 export const ColumnAddButton = memo(function ColumnAddButton() {
+  // 컬럼 추가 입력 폼 표시 여부
   const [isAdding, setIsAdding] = useState(false);
+  // 새로 추가할 컬럼의 제목
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const isSubmittingRef = useRef(false);

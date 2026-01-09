@@ -1,9 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { DateInput } from "@/components/ui/date-input";
 import {
   Dialog,
   DialogContent,
@@ -11,21 +12,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useColumns } from "@/features/column/hooks";
 import { useCreateCard } from "../hooks";
+import { CardFormValues, cardFormSchema } from "../lib/schemas";
+import { DescriptionField, DueDateField, TitleField } from "./CardFormFields";
 
 export const QuickAddTaskButton = memo(function QuickAddTaskButton() {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState<string | null>(null);
-  const isSubmittingRef = useRef(false);
 
   const { data: columns } = useColumns();
   const createCard = useCreateCard();
+
+  const form = useForm<CardFormValues>({
+    resolver: zodResolver(cardFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      dueDate: null,
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors, isValid },
+  } = form;
 
   // "To Do" 컬럼 찾기
   const todoColumn = useMemo(
@@ -33,50 +46,33 @@ export const QuickAddTaskButton = memo(function QuickAddTaskButton() {
     [columns]
   );
 
-  const resetForm = useCallback(() => {
-    setTitle("");
-    setDescription("");
-    setDueDate(null);
-  }, []);
-
-  const handleSubmit = useCallback(() => {
-    if (!todoColumn || createCard.isPending || isSubmittingRef.current) return;
-    isSubmittingRef.current = true;
-
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) {
-      isSubmittingRef.current = false;
-      return;
-    }
+  const onSubmit = (data: CardFormValues) => {
+    if (!todoColumn || createCard.isPending) return;
 
     createCard.mutate(
       {
         column_id: todoColumn.id,
-        title: trimmedTitle,
-        description: description.trim(),
-        due_date: dueDate,
+        title: data.title.trim(),
+        description: data.description?.trim() || "",
+        due_date: data.dueDate,
       },
       {
         onSuccess: () => {
-          resetForm();
+          reset();
           setOpen(false);
-          isSubmittingRef.current = false;
-        },
-        onError: () => {
-          isSubmittingRef.current = false;
         },
       }
     );
-  }, [todoColumn, createCard, title, description, dueDate, resetForm]);
+  };
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
       setOpen(newOpen);
       if (!newOpen) {
-        resetForm();
+        reset();
       }
     },
-    [resetForm]
+    [reset]
   );
 
   // To Do 컬럼이 없으면 버튼 비활성화
@@ -101,48 +97,32 @@ export const QuickAddTaskButton = memo(function QuickAddTaskButton() {
         <DialogHeader>
           <DialogTitle>새 작업 추가</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="quick-title">제목</Label>
-            <Input
-              id="quick-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-              placeholder="작업 제목 입력"
-              maxLength={100}
-              disabled={createCard.isPending}
-              autoFocus
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="quick-description">설명 (선택)</Label>
-            <Textarea
-              id="quick-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="작업 설명"
-              maxLength={1000}
-              rows={3}
-              disabled={createCard.isPending}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="quick-dueDate">마감일 (선택)</Label>
-            <DateInput
-              id="quick-dueDate"
-              value={dueDate}
-              onChange={setDueDate}
-              disabled={createCard.isPending}
-            />
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <TitleField
+            id="quick-title"
+            {...register("title")}
+            error={errors.title?.message}
+            autoFocus
+          />
+          <DescriptionField
+            id="quick-description"
+            {...register("description")}
+            error={errors.description?.message}
+          />
+          <Controller
+            name="dueDate"
+            control={control}
+            render={({ field }) => (
+              <DueDateField
+                id="quick-dueDate"
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
           <div className="flex justify-end gap-2 pt-2">
             <Button
+              type="button"
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={createCard.isPending}
@@ -150,14 +130,14 @@ export const QuickAddTaskButton = memo(function QuickAddTaskButton() {
               취소
             </Button>
             <Button
-              onClick={handleSubmit}
-              disabled={!title.trim()}
+              type="submit"
+              disabled={!isValid}
               loading={createCard.isPending}
             >
               추가
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
