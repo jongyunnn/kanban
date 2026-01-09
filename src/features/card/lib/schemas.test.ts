@@ -39,6 +39,39 @@ describe("Validation Schemas", () => {
         );
       }
     });
+
+    it("should fail when description is too long", () => {
+      const invalidData = {
+        title: "Valid Title",
+        description: "a".repeat(1001),
+        dueDate: null,
+      };
+      const result = cardFormSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe(
+          "카드 설명은 1000자 이내로 입력해주세요."
+        );
+      }
+    });
+
+    it("should accept null dueDate", () => {
+      const validData = {
+        title: "Valid Title",
+        description: "",
+        dueDate: null,
+      };
+      expect(cardFormSchema.safeParse(validData).success).toBe(true);
+    });
+
+    it("should accept string dueDate", () => {
+      const validData = {
+        title: "Valid Title",
+        description: "",
+        dueDate: "2025-12-31",
+      };
+      expect(cardFormSchema.safeParse(validData).success).toBe(true);
+    });
   });
 
   describe("columnTitleSchema", () => {
